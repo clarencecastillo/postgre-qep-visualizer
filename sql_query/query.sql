@@ -1,22 +1,22 @@
 SET SESSION query_cache_type=0;
 
 -- Question 1
-SELECT pubType, COUNT(*) FROM PUBLICATION
-WHERE pubYear >= 2000 AND pubYear <= 2017
-GROUP BY pubType;
+SELECT PUBLICATION.pubType, COUNT(*) FROM PUBLICATION
+WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017
+GROUP BY PUBLICATION.pubType;
 
 -- Question 2
-SELECT conference, MAX(pubCount) AS pubCount FROM (
-	SELECT PROCEEDING.pubKey, COUNT(*) AS pubCount, SPLIT_PART(SPLIT_PART(PROCEEDING.pubKey, 'conf/', -1), '/', 1) AS conference
+SELECT CONFERENCES.conference, MAX(CONFERENCES.pubCount) AS pubMaxCount FROM (
+	SELECT PROCEEDING.pubKey, COUNT(*) AS pubCount, SPLIT_PART(REVERSE(SPLIT_PART(REVERSE(PROCEEDING.pubKey), '/fnoc', 1)), '/', 1) AS conference
 	FROM PROCEEDING, INPROCEEDING, PUBMONTH
 	WHERE PROCEEDING.pubKey = INPROCEEDING.inproCrossRef
 	AND PUBMONTH.pubMonth = 'July'
 	AND PUBMONTH.pubKey = PROCEEDING.pubKey
-	AND proceedType = 'conf'
+	AND PROCEEDING.proceedType = 'conf'
 	GROUP BY PROCEEDING.pubKey
 ) AS CONFERENCES
 WHERE pubCount > 200
-GROUP BY conference;
+GROUP BY CONFERENCES.conference;
 
 -- Question 3 a
 -- X(author) = 'Mohamed-Slim Alouini'
@@ -30,9 +30,9 @@ AND PERSON.personFirstName = 'Mohamed-Slim' AND PERSON.personLastName = 'Alouini
 -- Question 3 b
 -- X(author) = 'Alexander Sprintson', Y(year) = 2015, Z(conference) = 'allerton'
 SELECT * FROM (
-	SELECT INPROCEEDING.pubKey, pubTitle, pubYear, pubMdate, pubType,
+	SELECT INPROCEEDING.pubKey, PUBLICATION.pubTitle, PUBLICATION.pubYear, PUBLICATION.pubMdate, PUBLICATION.pubType,
 	CONCAT(PERSON.personFirstName, ' ', PERSON.personLastName) as pubAuthor,
-	SPLIT_PART(SPLIT_PART(PROCEEDING.pubKey, 'conf/', -1), '/', 1) AS conference
+	SPLIT_PART(REVERSE(SPLIT_PART(REVERSE(PROCEEDING.pubKey), '/fnoc', 1)), '/', 1) AS conference
 	FROM INPROCEEDING, AUTHORSHIP, PERSON, PROCEEDING, PUBLICATION
 	WHERE INPROCEEDING.pubKey = PUBLICATION.pubKey
 	AND INPROCEEDING.pubKey = AUTHORSHIP.pubKey
@@ -41,7 +41,7 @@ SELECT * FROM (
 	AND PERSON.personFirstName = 'Alexander' AND PERSON.personLastName = 'Sprintson'
 	AND PUBLICATION.pubYear = 2015
 ) AS AUTHOR_PUBLICATIONS
-WHERE conference = 'allerton';
+WHERE AUTHOR_PUBLICATIONS.conference = 'allerton';
 
 -- Question 3 c
 -- Z(conference) = 'sigmod', Y(year) = 2014
@@ -58,7 +58,7 @@ AND PUBLICATION.pubYear = 2014
 AND PROCEEDING.pubkey LIKE 'conf/sigmod/%'
 GROUP BY AUTHORSHIP.personKey, PERSON.personFirstName, PERSON.personLastName
 HAVING COUNT(*) >= 2;
-        
+
 
 -- Question 4 a
 SELECT CONCAT(PERSON.personFirstName, ' ', PERSON.personLastName) AS pubAuthor,
