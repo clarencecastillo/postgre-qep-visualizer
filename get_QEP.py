@@ -26,139 +26,173 @@ def get_qep(query, connection = connection):
 
     return qep, 'No Error'
 
+def parse(plan):
+    map = {}
+    query_match = None
 
-def print_qep(query):
-    qep, msg = get_qep(query)
-
-    if qep is not None:
-        for execution in qep:
-            print(execution)
+    if plan['Node Type'] == 'Seq Scan':
+        query_match = parse_seq_scan(plan)
+    elif plan['Node Type'] == 'Index Scan':
+        query_match = parse_index_scan(plan)
+    elif plan['Node Type'] == 'Hash Join':
+        query_match = parse_hash_join(plan)
+    elif plan['Node Type'] == 'Aggregate':
+        query_match = parse_aggregate(plan)
+    elif plan['Node Type'] == 'Gather':
+        query_match = parse_gather(plan)
     else:
-        print(msg)
+        query_match = parse_general(plan)
 
-def get_action_cost(action_str):
-    action = action_str.split('  ')[0]
+    map['Mapping'] = query_match
+    if 'Plans' in plan.keys():
+        map['Plans'] = parse_sub_plans(plan)
 
-    cost_estimate = qep[0][0].replace(') (', ')  (').split('  ')[1].replace('(', '').replace(')', '').split(' ')
-    times = cost_estimate[0].split('=')[1]
-    time_list = times.split('..')
-    time = round(float(time_list[1]) - float(time_list[0]), 3)
-    cost_estimate[0] = cost_estimate[0].replace(times, str(time))
-    cost_estimate = {element.split('=')[0]: element.split('=')[1] for element in cost_estimate}
+    return map
 
-    cost_actual = qep[0][0].replace(') (', ')  (').split('  ')[2].replace('(', '').replace(')', '').replace('actual time', 'cost').split(' ')
-    times = cost_actual[0].split('=')[1]
-    time_list = times.split('..')
-    time = round(float(time_list[1]) - float(time_list[0]), 3)
-    cost_actual[0] = cost_actual[0].replace(times, str(time))
-    cost_actual
-    cost_actual = {element.split('=')[0]: element.split('=')[1] for element in cost_actual}
+def parse_sub_plans(plan):
+    plans = []
+    for sub_plan in plan['Plans']:
+        plans.append(parse(sub_plan))
+    return plans
 
-    return {'action': action, 'cost_estimate': cost_estimate, 'cost_actual': cost_actual}
+def parse_general(plan):
+    node_type = plan['Node Type']
+    return [node_type.upper()]
 
-query_error = """
-        EXPLAIN ANALYZE \
-        SELECT pubType, COUNT(*) FROM PUBLICATION \
-        WHERE pubYear >= 2000 AND pubYear <= 2017 \
-        GROUP BY pubYear
-        """
-print_qep(query_error)
+def parse_aggregate(plan):
+    query_matches = []
+    if plan['Node Type'] == 'Aggregate':
+        group_key = ', '.join(plan['Group Key'])
+        query_match = ' '.join(['GROUP BY', group_key])
+        query_matches.append(query_match.upper())
+        return query_matches
+    else:
+        print('Not Aggregate.')
+
+def parse_seq_scan(plan):
+    query_matches = []
+    if plan['Node Type'] == 'Seq Scan':
+        if 'Filter' in plan.keys():
+            filter = plan['Filter'].replace('::text', '').replace('(', '').replace(')', '')
+            query_match = ' '.join([filter])
+            query_matches.append(query_match.upper())
+        return query_matches
+    else:
+        print('Not Seq Scan.')
+
+def parse_index_scan(plan):
+    query_matches = []
+    if plan['Node Type'] == 'Index Scan':
+        if 'Filter' in plan.keys():
+            filter = plan['Filter'].replace('::text', '').replace('(', '').replace(')', '')
+            relation_name = plan['Relation Name'].upper()
+            query_match = ' '.join([relation_name + '.' + filter])
+            query_matches.append(query_match.upper())
+        if 'Index Cond' in plan.keys():
+            index_cond = plan['Index Cond'].replace('::text', '').replace('(', '').replace(')', '')
+            query_match = ' '.join([index_cond])
+            query_matches.append(query_match.upper())
+        return query_matches
+    else:
+        print('Not Index Scan.')
+
+def parse_hash_join(plan):
+    query_matches = []
+    if plan['Node Type'] == 'Hash Join':
+        if 'Hash Cond' in plan.keys():
+            hash_cond = plan['Hash Cond'].replace('::text', '').replace('(', '').replace(')', '')
+            query_match = ' '.join([hash_cond])
+            query_matches.append(query_match.upper())
+        return query_matches
+    else:
+        print('Not Index Scan.')
+
+def parse_gather(plan):
+    query_matches = []
+    if plan['Node Type'] == 'Gather':
+        if 'Output' in plan.keys():
+            outputs = ', '.join(plan['Output']).replace('PARTIAL ', '')
+            query_match = ' '.join(['SELECT', outputs])
+            query_matches.append(query_match.upper())
+        return query_matches
+    else:
+        print('Not Index Scan.')
 
 query = """
-        SELECT pubType, COUNT(*) FROM PUBLICATION \
-        WHERE pubYear >= 2000 AND pubYear <= 2017 \
-        GROUP BY pubType
-        """
-query = """
-        SELECT pubType FROM PUBLICATION
-        """
-query = """
-        SELECT CONCAT(PERSON.personFirstName, ' ', PERSON.personLastName) AS pubAuthor,
-        PVLDB.count AS pvldbCount,
-        SIGMOD.count AS sigmodCount
-        FROM
-        (
-        	SELECT COUNT(*) AS count, AUTHORSHIP.personKey AS personKey FROM PUBLICATION, AUTHORSHIP
-        	WHERE PUBLICATION.pubKey = AUTHORSHIP.pubKey
-        	AND PUBLICATION.pubKey LIKE '%pvldb%'
-        	GROUP BY AUTHORSHIP.personKey
-        ) AS PVLDB,
-        (
-        	SELECT COUNT(*) AS count, AUTHORSHIP.personKey AS personKey FROM PUBLICATION, AUTHORSHIP
-        	WHERE PUBLICATION.pubKey = AUTHORSHIP.pubKey
-        	AND PUBLICATION.pubKey LIKE '%sigmod%'
-        	GROUP BY AUTHORSHIP.personKey
-        ) AS SIGMOD,
-        PERSON
-        WHERE PERSON.personKey = PVLDB.personKey
-        AND PVLDB.personKey = SIGMOD.personKey
-        AND PVLDB.count >= 10
-        AND SIGMOD.count >= 10
-        """
+        SELECT
+        AUTHORSHIP.personKey,
+        CONCAT(PERSON.personFirstName, ' ', PERSON.personLastName) as personName,
+        COUNT(*) AS pubCount
+        FROM PUBLICATION, INPROCEEDING, AUTHORSHIP, PROCEEDING, PERSON
+        WHERE INPROCEEDING.pubKey = PUBLICATION.pubKey
+        AND INPROCEEDING.pubKey = AUTHORSHIP.pubKey
+        AND PROCEEDING.pubKey = INPROCEEDING.inproCrossRef
+        AND PERSON.personKey = AUTHORSHIP.personKey
+        AND PUBLICATION.pubYear = 2014
+        AND PROCEEDING.pubkey LIKE 'conf/sigmod/%'
+        GROUP BY AUTHORSHIP.personKey, PERSON.personFirstName, PERSON.personLastName
+        HAVING COUNT(*) >= 2;
+        """.upper()
 
-qep, msg = get_qep('EXPLAIN (FORMAT JSON)' + query)
-qep, msg = get_qep('EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)' + query)
-
-
-data = [{'Plan': {'Node Type': 'Seq Scan',
-   'Relation Name': 'publication',
-   'Schema': 'public',
-   'Alias': 'publication',
-   'Startup Cost': 0.0,
-   'Total Cost': 30385.53,
-   'Plan Rows': 1070653,
-   'Plan Width': 9,
-   'Actual Startup Time': 0.071,
-   'Actual Total Time': 242.622,
-   'Actual Rows': 1070653,
-   'Actual Loops': 1,
-   'Output': ['pubtype'],
-   'Shared Hit Blocks': 11167,
-   'Shared Read Blocks': 8512,
-   'Shared Dirtied Blocks': 0,
-   'Shared Written Blocks': 0,
-   'Local Hit Blocks': 0,
-   'Local Read Blocks': 0,
-   'Local Dirtied Blocks': 0,
-   'Local Written Blocks': 0,
-   'Temp Read Blocks': 0,
-   'Temp Written Blocks': 0},
-  'Planning Time': 0.442,
-  'Triggers': [],
-  'Execution Time': 304.371}]
-
-
-len(qep[0][0][0]['Plan']['Plans'])
-qep[0][0][0].keys()
-qep[0][0][0]['Plan']
-
-qep, msg = get_qep('EXPLAIN (ANALYZE)' + query)
+qep, msg = get_qep('EXPLAIN ANALYZE' + query)
+qep, msg = get_qep(query)
+qep, msg = get_qep('EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON)' + query)
 qep
+plan = qep[0][0][0]['Plan']
+plan
+parse(plan)
 
 
 
 
-# action_indices_start = [0]
-# for i in range(len(qep)):
-#     if '->' in qep[i][0]:
-#         action_indices_start.append(i)
-# action_indices_end = action_indices_start[1:] + [len(qep) - 2]
-# action_indices_end = [i-1 for i in action_indices_end]
-# action_indice_ranges = [[action_indices_start[i], action_indices_end[i]]for i in range(len(action_indices_start))]
-# action_indice_ranges
+
+# import sqlparse
 #
-# qep_dict = []
-# for action_indice_range in action_indice_ranges:
-#     desc = qep[action_indice_range[0]][0]
-#     desc = desc.split('->')[-1].strip()
-#     action_plan = get_action_cost(desc)
-#     for i in range(action_indice_range[0] + 1, action_indice_range[1]):
-#         key = qep[i][0].split(': ')[0].strip()
-#         value = qep[i][0].split(': ')[1].strip()
-#         action_plan[key] = value
-#     qep_dict.append(action_plan)
-# qep_dict
+# parsed = sqlparse.parse(query)
+# stmt = parsed[0]
+#
+# for token in stmt.tokens:
+#     print(type(token), token.ttype, token.value)
+#
+# identifier_list = stmt.tokens[4]
+# for identifier in identifier_list.get_identifiers():
+#     print(type(identifier), identifier.ttype, identifier.value)
+#
+# for identifier in identifier_list.get_identifiers():
+#     print(type(identifier), identifier.ttype, identifier.value, identifier.get_real_name())
+#
+# where = stmt.tokens[-1]
+# for token in where.tokens:
+#     print(type(token), token.ttype, token.value)
+#
+# for id, item in enumerate(where.flatten()):
+#     print(id, item.value)
+#
+# for item in stmt.flatten():
+#     print(item.ttype)
+#     print(item.parent.parent)
+#     if item.ttype is sqlparse.tokens.Keyword.DML and item.value.upper() == 'SELECT':
+#         print(item.parent)
+
 
 
 # Startup cost is a tricky concept. It doesn't just represent the amount of time before that component starts. It represents the amount of time between when the component starts executing (reading in data) and when the component outputs its first row.
 # Total cost is the entire execution time of the component, from when it begins reading in data to when it finishes writing its output.
+
+#
+# {
+#     'Plan':{'Mapping': "query",
+#             'Plans': [{'Mapping': 'query',
+#                        'Plans': [{'Mapping': 'query',
+#                                   'Plans': [{'Mapping': 'query'}]}]},
+#                       {'Mapping': 'query'}, ]
+#     }
+# }
+#
+# query_error = """
+#         EXPLAIN ANALYZE \
+#         SELECT pubType, COUNT(*) FROM PUBLICATION \
+#         WHERE pubYear >= 2000 AND pubYear <= 2017 \
+#         GROUP BY pubYear
+#         """
+# print_qep(query_error)

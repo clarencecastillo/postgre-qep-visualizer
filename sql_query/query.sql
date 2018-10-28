@@ -47,7 +47,7 @@ WHERE conference = 'allerton';
 -- Z(conference) = 'sigmod', Y(year) = 2014
 SELECT
 AUTHORSHIP.personKey,
-CONCAT(personFirstName, ' ', PERSON.personLastName) as personName,
+CONCAT(PERSON.personFirstName, ' ', PERSON.personLastName) as personName,
 COUNT(*) AS pubCount
 FROM PUBLICATION, INPROCEEDING, AUTHORSHIP, PROCEEDING, PERSON
 WHERE INPROCEEDING.pubKey = PUBLICATION.pubKey
@@ -55,9 +55,10 @@ AND INPROCEEDING.pubKey = AUTHORSHIP.pubKey
 AND PROCEEDING.pubKey = INPROCEEDING.inproCrossRef
 AND PERSON.personKey = AUTHORSHIP.personKey
 AND PUBLICATION.pubYear = 2014
-AND SPLIT_PART(SPLIT_PART(PROCEEDING.pubKey, 'conf/', -1), '/', 1) = 'sigmod'
-GROUP BY personKey
+AND PROCEEDING.pubkey LIKE 'conf/sigmod/%'
+GROUP BY AUTHORSHIP.personKey, PERSON.personFirstName, PERSON.personLastName
 HAVING COUNT(*) >= 2;
+        
 
 -- Question 4 a
 SELECT CONCAT(PERSON.personFirstName, ' ', PERSON.personLastName) AS pubAuthor,
