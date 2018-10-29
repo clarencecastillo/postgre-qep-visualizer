@@ -1,0 +1,25 @@
+:host {
+  height: calc(100vh - 3rem);
+  display: block;
+}
+
+.container-fluid {
+  height: 100%;
+}
+
+app-visualizer {
+  display: block;
+  flex-grow: 1;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+
+  & > * {
+    flex-basis: 0px;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  
+}

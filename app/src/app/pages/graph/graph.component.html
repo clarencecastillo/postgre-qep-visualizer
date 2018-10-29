@@ -1,0 +1,12 @@
+<div class="container-fluid pt-5">
+  <h4 class="text-light mb-4">Visualization</h4>
+  <div class="d-flex w-100">
+    <app-visualizer class="w-75" [plan]="plan" [query]="query"></app-visualizer>
+    <div class="sidebar w-25">
+      <app-inspector *ngIf="selectedPlan" [plan]="selectedPlan"></app-inspector>
+      <div class="d-flex align-items-center" *ngIf="!selectedPlan">
+        <p class="text-light block text-center w-100"><em>Select a node on the tree to inspect.</em></p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+table {
+  table-layout: fixed;
+
+  td {
+    font-size: 0.8rem;
+    word-wrap: break-word;
+  }
+}

@@ -1,0 +1,35 @@
+<div class="container-fluid">
+  <h6 class="text-light"><b>Node Inspector</b></h6>
+  <table class="table table-hover text-light table-sm table-borderless">
+    <thead>
+      <tr>
+        <th scope="col">Key</th>
+        <th scope="col">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let attribute of attributes">
+        <td scope="row">{{attribute}}</td>
+        <td class="text-muted">{{plan[attribute]}}</td>
+      </tr>
+      <tr>
+        <td scope="row">Plans</td>
+        <td class="text-muted" *ngIf="plan['Plans']">
+          <span class="btn badge badge-secondary mr-1" *ngFor="let plan of plan['Plans']; let i = index" (click)="select(i)">{{plan['Node Type']}}</span>
+        </td>
+        <td class="text-muted" *ngIf="!plan['Plans']">No Plans</td>
+      </tr>
+      <tr *ngFor="let attribute of CALCULATED_ATTRIBUTES">
+        <td scope="row">*{{attribute}}</td>
+        <td class="text-muted">{{plan[attribute] | number: '1.2-2'}}</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">
+          <small class="text-secondary">*Calculated attributes</small>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</div>

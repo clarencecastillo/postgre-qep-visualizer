@@ -1,0 +1,27 @@
+<div class="node" *ngFor="let plan of plans; let i = index" [ngClass]="{'highlighted': highlighted && highlightedPlanIndex == i, 'selected': selected && selectedPlanIndex == i}">
+  <div class="card-wrapper">
+    <div class="card" (mouseenter)="highlight(i)" (mouseleave)="unhighlight()" (click)="select(i)">
+      <div class="card-body">
+        <h5 class="card-title d-flex justify-content-between m-0">
+          <div class="text-sm node-type">{{plan['Node Type']}}</div>
+          <div class="text-sm">{{plan['Actual Duration'] | number: '1.2-2'}}ms</div>
+        </h5>
+        <div [ngSwitch]="plan['Node Type']" class="node-summary">
+          <small *ngSwitchCase="'Sort'" class="text-secondary">
+            by <code>{{plan['Sort Key']}}</code>
+          </small>
+          <small *ngSwitchCase="'Aggregate'" class="text-secondary">
+            by <code>{{plan['Group Key']}}</code>
+          </small>
+          <small *ngSwitchCase="'Hash Join'" class="text-secondary">
+            <code>{{plan['Join Type']}}</code> join on <code>{{plan['Hash Cond']}}</code>
+          </small>
+          <small *ngSwitchCase="'Seq Scan'" class="text-secondary">
+            on <code>{{plan['Schema']}}.{{plan['Relation Name']}} ({{plan['Alias']}})</code>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-node [plans]="plan['Plans']" [ngClass]="{'split': plan['Plans'] && plan['Plans'].length > 1}"></app-node>
+</div>
