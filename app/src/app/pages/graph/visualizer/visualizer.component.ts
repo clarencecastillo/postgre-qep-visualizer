@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { PlanService } from 'src/app/services/plan/plan.service';
+import { NodeComponent } from './node/node.component';
 
 @Component({
   selector: 'app-visualizer',
@@ -16,6 +17,7 @@ export class VisualizerComponent implements OnInit {
 
   ngOnInit() {
     this.planService.augmentStatistics(this.plan);
+    NodeComponent.nodes = [];
   }
 
   deselectPlan() {
