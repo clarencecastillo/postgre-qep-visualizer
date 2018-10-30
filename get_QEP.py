@@ -51,24 +51,30 @@ def calculate_actual_duration(plan):
     actual_duration = actual_duration * plan['Actual Loops'];
     return actual_duration;
 
-def get_query_components(plan):
+def get_query_components(plan, query):
 
     query_components = []
 
     if plan['Node Type'] == 'Seq Scan':
-        query_components = parse_seq_scan(plan)
+        query_components = parse_seq_scan(plan, query)
     elif plan['Node Type'] == 'Index Only Scan' or plan['Node Type'] == 'Bitmap Index Scan' or plan['Node Type'] == 'Bitmap Heap Scan':
-        query_components = parse_index_only_scan(plan)
+        query_components = parse_index_only_scan(plan, query)
     elif plan['Node Type'] == 'Index Scan':
-        query_components = parse_index_scan(plan)
-    elif plan['Node Type'] == 'Hash Join' or plan['Node Type'] == 'Merge Join':
-        query_components = parse_join(plan)
+        query_components = parse_index_scan(plan, query)
+    elif plan['Node Type'] == 'Hash Join':
+        query_components = parse_hash_join(plan, query)
+    elif plan['Node Type'] == 'Merge Join':
+        query_components = parse_merge_join(plan, query)
     elif plan['Node Type'] == 'Aggregate':
-        query_components = parse_aggregate(plan)
-    elif plan['Node Type'] == 'Gather':
-        query_components = parse_general(plan)
+        query_components = parse_aggregate(plan, query)
+    elif plan['Node Type'] == 'Sort':
+        query_components = parse_sort(plan, query)
+    elif plan['Node Type'] == 'Limit':
+        query_components = parse_limit(plan, query)
+    elif plan['Node Type'] == 'Unique':
+        query_components = parse_unique(plan, query)
     else:
-        query_components = parse_general(plan)
+        query_components = parse_general(plan, query)
 
     return query_components
 
@@ -88,21 +94,21 @@ def get_node_description(plan):
 
     return description
 
-def parse(plan):
-    plan['Query'] = get_query_components(plan)
+def parse(plan, query):
+    plan['Query'] = get_query_components(plan, query)
     plan['Actual Duration'] = calculate_actual_duration(plan)
     plan['Description'] = get_node_description(plan)
 
     if 'Plans' in plan.keys():
         for sub_plan in plan['Plans']:
-            parse(sub_plan)
+            parse(sub_plan, query)
 
-def parse_general(plan):
+def parse_general(plan, query):
     node_type = plan['Node Type']
     return [node_type.upper()]
 
 # Scans ------------------------------------------------------------------------
-def process_filter(filter):
+def process_filter(filter, query):
     elements = filter.split(' ')
     filters = []
 
@@ -116,50 +122,52 @@ def process_filter(filter):
 
         filters.append(' '.join([left, sign, right]))
 
-        if sign == '=':
-            filters.append(' '.join([right, sign, left]))
-
         if left in aliases.keys():
             filters.append(' '.join([aliases[left], sign, right]))
 
     return filters
 
-def process_index_cond(cond):
+def process_index_cond(cond, query):
     # remove extra information to match the exact query component
     # Eg. 'Index Cond': "(pubmonth.pubkey = 'books/aw/AhoHU83'::text)"
     index_cond = cond.replace('::text', '').replace('(', '').replace(')', '').upper()
 
     # split the conditions connencted by 'OR' or 'AND'
     # Eg. 'Filter': '((publisher.publisherid < 10) OR (publisher.publisherid > 100))'
-    index_conds = index_cond.replace('OR', 'AND').split('AND')
+    index_conds = index_cond.replace(' OR ', ' AND ').split(' AND ')
 
     # remove the whitespace atteched to the condition
-    index_conds = [cond.strip() for cond in index_conds]
+    conds = []
+    for cond in index_conds:
+        left = cond.split('=')[0].strip()
+        right = cond.split('=')[1].strip()
+        conds.append(' '.join([left, '=', right]))
+        conds.append(' '.join([right, '=', left]))
 
-    return index_conds
+    return conds
 
 
-def parse_seq_scan(plan):
+def parse_seq_scan(plan, query):
     query_matches = []
     if plan['Node Type'] == 'Seq Scan':
         if 'Filter' in plan.keys():
-            filters = process_filter(plan['Filter'])
+            filters = process_filter(plan['Filter'], query)
             query_matches = query_matches + filters
 
         return query_matches
     else:
         print('Not Seq Scan.')
 
-def parse_index_only_scan(plan):
+def parse_index_only_scan(plan, query):
     query_matches = []
-    if plan['Node Type'] == 'Index Scan' or plan['Node Type'] == 'Bitmap Index Scan' or plan['Node Type'] == 'Bitmap Heap Scan':
+    if plan['Node Type'] == 'Index Only Scan' or plan['Node Type'] == 'Bitmap Index Scan' or plan['Node Type'] == 'Bitmap Heap Scan':
 
         if 'Index Cond' in plan.keys():
-            index_conds = process_index_cond(plan['Index Cond'])
+            index_conds = process_index_cond(plan['Index Cond'], query)
             query_matches = query_matches + index_conds
 
         if 'Recheck Cond' in plan.keys():
-            index_conds = process_index_cond(plan['Recheck Cond'])
+            index_conds = process_index_cond(plan['Recheck Cond'], query)
             query_matches = query_matches + index_conds
 
         return query_matches
@@ -167,22 +175,22 @@ def parse_index_only_scan(plan):
         print('Not Index Only Scan.')
 
 # A combination of Seq Scan and Index Only Scan
-def parse_index_scan(plan):
+def parse_index_scan(plan, query):
     query_matches = []
     if plan['Node Type'] == 'Index Scan':
         if 'Filter' in plan.keys():
-            filters = process_filter(plan['Filter'])
+            filters = process_filter(plan['Filter'], query)
             query_matches = query_matches + filters
 
         if 'Index Cond' in plan.keys():
-            index_conds = process_index_cond(plan['Index Cond'])
+            index_conds = process_index_cond(plan['Index Cond'], query)
             query_matches = query_matches + index_conds
         return query_matches
     else:
         print('Not Index Scan.')
 
 # Joins ------------------------------------------------------------------------
-def process_join_cond(cond):
+def process_join_cond(cond, query):
     conds = []
     cond = cond.replace('::text', '').replace('(', '').replace(')', '').upper()
     # Address the reording of the attributes on the left and right of the '=' sign
@@ -193,40 +201,70 @@ def process_join_cond(cond):
     return conds
 
 
-def parse_join(plan):
+def parse_hash_join(plan, query):
     query_matches = []
-    if plan['Node Type'] == 'Hash Join' or plan['Node Type'] == 'Merge Join':
+    if plan['Node Type'] == 'Hash Join':
         if 'Hash Cond' in plan.keys():
-            conds = process_join_cond(plan['Hash Cond'])
+            conds = process_join_cond(plan['Hash Cond'], query)
             query_matches = query_matches + conds
         return query_matches
     else:
-        print('Not Join.')
+        print('Not Hash Join.')
 
-# Aggregate --------------------------------------------------------------------
-def parse_aggregate(plan):
+def parse_merge_join(plan, query):
+    query_matches = []
+    if plan['Node Type'] == 'Merge Join':
+        if 'Merge Cond' in plan.keys():
+            conds = process_join_cond(plan['Merge Cond'], query)
+            query_matches = query_matches + conds
+        return query_matches
+    else:
+        print('Not Merge Join.')
+
+
+def parse_aggregate(plan, query):
     query_matches = []
     if plan['Node Type'] == 'Aggregate':
         if 'Group Key' in plan.keys():
             group_key = ', '.join(plan['Group Key'])
+            # Two cases of using Aggregate:
+            # One is 'Group By'
             query_match = ' '.join(['GROUP BY', group_key])
+            query_matches.append(query_match.upper())
+            # Another is 'DISTINCT'
+            query_match = ' '.join(['DISTINCT', group_key])
             query_matches.append(query_match.upper())
         return query_matches
     else:
         print('Not Aggregate.')
 
-def parse_gather(plan):
+def parse_sort(plan, query):
     query_matches = []
-    if plan['Node Type'] == 'Gather':
-        if 'Output' in plan.keys():
-            outputs = ', '.join(plan['Output']).replace('PARTIAL ', '').replace('::text', '')
-            query_match = ' '.join([outputs])
+    if plan['Node Type'] == 'Sort':
+        if 'Sort Key' in plan.keys():
+            sort_key = sort_keys = ', '.join(plan['Sort Key']).replace('(', '').replace(')', '').replace('*', '(*)')
+            query_match = ' '.join(['ORDER BY', sort_key])
             query_matches.append(query_match.upper())
         return query_matches
     else:
-        print('Not Index Scan.')
+        print('Not Sort.')
 
+def parse_limit(plan, query):
+    query_matches = []
+    if plan['Node Type'] == 'Limit':
+        query_match = re.findall('LIMIT \d+', query)[0]
+        query_matches.append(query_match.upper())
+        return query_matches
+    else:
+        print('Not Limit.')
 
+def parse_unique(plan, query):
+    query_matches = []
+    if plan['Node Type'] == 'Unique':
+        query_matches.append('DISTINCT')
+        return query_matches
+    else:
+        print('Not Unique.')
 
 
 def find_aliases(query):
@@ -284,21 +322,24 @@ queries = {
 
     "Aggregate": """
             SELECT PUBLICATION.pubType, PUBLICATION.pubYear, COUNT(*) FROM PUBLICATION
-            WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017
             GROUP BY PUBLICATION.pubType, PUBLICATION.pubYear;
+            """,
+    "Sort": """
+            SELECT PUBLICATION.pubYear, PUBLICATION.pubType, COUNT(*) FROM PUBLICATION
+            GROUP BY PUBLICATION.pubType, PUBLICATION.pubYear
+            ORDER BY COUNT(*) DESC, PUBLICATION.pubYear;
+            """,
+
+    "Unique": """
+            SELECT DISTINCT PUBLICATION.pubKey
+            FROM PUBLICATION;
             """,
 }
 
-query = """
-        SELECT PUBLICATION.pubType, COUNT(*) FROM PUBLICATION
-        WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017
-        GROUP BY PUBLICATION.pubType;
-        """
 
 query = """
-        SELECT PUBLICATION.pubType, PUBLICATION.pubYear, COUNT(*) FROM PUBLICATION
-        WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017
-        GROUP BY PUBLICATION.pubType, PUBLICATION.pubYear;
+        SELECT DISTINCT PUBLICATION.pubYear
+        FROM PUBLICATION;
         """
 
 query = get_test_query('Seq Scan')
@@ -309,6 +350,7 @@ query = get_test_query('Bitmap Index Scan')
 query = get_test_query('Bitmap Heap Scan')
 query = get_test_query('Hash Join')
 query = get_test_query('Aggregate')
+query = get_test_query('Sort')
 print_test_query(query)
 
 qep, msg = get_qep('EXPLAIN (ANALYZE, VERBOSE)' + query)
@@ -323,54 +365,6 @@ plan = qep[0][0][0]['Plan']
 # qep = read_qep_from_json('tests/seq_scan.json')
 # plan = qep[0]['Plan']
 
-parse(plan)
+parse(plan, query)
 qep
 plan
-
-
-
-
-
-
-
-# import sqlparse
-#
-# parsed = sqlparse.parse(query)
-# stmt = parsed[0]
-#
-# for token in stmt.tokens:
-#     print(type(token), token.ttype, token.value)
-#
-# identifier_list = stmt.tokens[4]
-# for identifier in identifier_list.get_identifiers():
-#     print(type(identifier), identifier.ttype, identifier.value)
-#
-# for identifier in identifier_list.get_identifiers():
-#     print(type(identifier), identifier.ttype, identifier.value, identifier.get_real_name())
-#
-# where = stmt.tokens[-1]
-# for token in where.tokens:
-#     print(type(token), token.ttype, token.value)
-#
-# for id, item in enumerate(where.flatten()):
-#     print(id, item.value)
-#
-# for item in stmt.flatten():
-#     print(item.ttype)
-#     print(item.parent.parent)
-#     if item.ttype is sqlparse.tokens.Keyword.DML and item.value.upper() == 'SELECT':
-#         print(item.parent)
-
-
-
-# Startup cost is a tricky concept. It doesn't just represent the amount of time before that component starts. It represents the amount of time between when the component starts executing (reading in data) and when the component outputs its first row.
-# Total cost is the entire execution time of the component, from when it begins reading in data to when it finishes writing its output.
-
-
-
-
-# query = """
-#         SELECT PUBLICATION.pubType, COUNT(*) FROM PUBLICATION
-#         WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017
-#         GROUP BY PUBLICATION.pubType;
-#         """
