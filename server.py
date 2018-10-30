@@ -4,7 +4,7 @@ import os
 from analysis import analyze
 
 # set the project root directory as the static folder, you can set others.
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
@@ -22,7 +22,8 @@ def api():
 
 @app.route('/<path:path>')
 def root(path):
-    return send_from_directory('', path)
+    print(path)
+    return send_from_directory('static', path)
 
 if __name__ == "__main__":
     app.run()
