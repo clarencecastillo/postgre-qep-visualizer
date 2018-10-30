@@ -1,0 +1,26 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Seq Scan",
+      "Parallel Aware": false,
+      "Relation Name": "publication",
+      "Schema": "public",
+      "Alias": "publication",
+      "Startup Cost": 0.00,
+      "Total Cost": 35738.79,
+      "Plan Rows": 847367,
+      "Plan Width": 75,
+      "Actual Startup Time": 0.038,
+      "Actual Total Time": 180.391,
+      "Actual Rows": 844485,
+      "Actual Loops": 1,
+      "Output": ["pubtitle"],
+      "Filter": "((publication.pubyear >= 2000) AND (publication.pubyear <= 2017))",
+      "Rows Removed by Filter": 226168
+    },
+    "Planning Time": 0.049,
+    "Triggers": [
+    ],
+    "Execution Time": 221.255
+  }
+]
