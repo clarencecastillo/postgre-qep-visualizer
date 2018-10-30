@@ -1,15 +1,17 @@
 <div class="container pt-5 pb-5">
   <div class="container-fluid">
     <h4 class="text-light mb-4">Query Execution Plan (JSON)</h4>
-    <p class="text-light lead">For best results, paste the output of <code>EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)</code>.</p>
+    <hr>
+    <p class="text-light lead">Paste the output of <code>EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)</code>.</p>
     <app-ide [text]="planText" (textChange)="onPlanTextChange($event)" [error]="error"></app-ide>
   </div>
-  <div class="container-fluid pt-5">
+  <div class="container-fluid pt-3">
     <h4 class="text-light mb-4">SQL Query</h4>
+    <hr>
     <app-ide [(text)]="query"></app-ide>
   </div>
-  <div class="p-5 pt-3">
+  <div class="container-fluid pb-5 pt-3">
     <hr>
-    <button type="button" class="btn btn-outline-light btn-lg float-right border-0" [disabled]="error" routerLink="/graph" (click)="onSubmit()">Submit</button>
+    <button type="button" class="btn btn-outline-light float-right border-0" [disabled]="error" routerLink="/graph" (click)="onSubmit()">Submit</button>
   </div>
 </div>
