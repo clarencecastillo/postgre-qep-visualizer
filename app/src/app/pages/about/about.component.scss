@@ -1,0 +1,20 @@
+:host {
+  height: calc(100vh - 3rem);
+  display: block;
+}
+
+.container {
+  height: 100%;
+}
+
+.display-4 {
+  font-weight: 200;
+}
+
+.cover {
+  zoom: 1.2;
+}
+
+.table {
+  table-layout: fixed;
+}
