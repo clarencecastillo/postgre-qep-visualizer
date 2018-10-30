@@ -4,6 +4,7 @@ import { AppComponent } from './app.component';
 import { PagesModule } from './pages/pages.module';
 import { AppRoutingModule } from './app-routing.module';
 import { ServicesModule } from './services/services.module';
+import { PipesModule } from './pipes/pipes.module';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { ServicesModule } from './services/services.module';
     BrowserModule,
     AppRoutingModule,
     PagesModule,
-    ServicesModule
+    ServicesModule,
+    PipesModule
   ],
   providers: [],
   bootstrap: [

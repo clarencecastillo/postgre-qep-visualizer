@@ -16,7 +16,6 @@ export class VisualizerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.planService.augmentStatistics(this.plan);
     NodeComponent.nodes = [];
   }
 

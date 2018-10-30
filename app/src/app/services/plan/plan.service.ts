@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +18,7 @@ export class PlanService {
   private selectedPlanChange: Subject<any>;
   readonly onSelectedPlanChange: Observable<any>;
 
-  constructor() {
+  constructor(private http: HttpClient) {
 
     this.selectedPlanChange = new Subject();
     this.onSelectedPlanChange = this.selectedPlanChange.asObservable();
@@ -71,33 +73,11 @@ export class PlanService {
     return this.query;
   }
 
-  augmentStatistics(executionPlan: any) {
-    this.augmentPlanStatistics(executionPlan['Plan']);
+  getAugmentedPlanStatistics(plan: any, query: string) {
+    return this.http.post(`http://${environment.api}/api/parse`, {
+      plan, query
+    }).toPromise();
   }
-
-  augmentPlanStatistics(plan: any) {
-    plan['Actual Duration'] = this.calculateActualDuration(plan);
-    if (plan['Plans']) {
-      plan['Plans'].forEach(subPlan => this.augmentPlanStatistics(subPlan));
-    }
-  }
-
-  calculateActualDuration(plan): number {
-    let actualDuration: number = plan['Actual Total Time'];
-    if (plan['Plans']) {
-      plan['Plans'].forEach(subPlan => {
-        if (subPlan['Node Type'] !== 'CTE_Scan') {
-          actualDuration -= subPlan['Actual Total Time'];
-        }
-      });
-    }
-
-    // time is reported for an invidual loop
-    // actual duration must be adjusted by number of loops
-    actualDuration = actualDuration * plan['Actual Loops'];
-    return actualDuration;
-  }
-
 }
 
 // export class Plan {

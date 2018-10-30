@@ -10,9 +10,10 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class GraphComponent implements OnInit, OnDestroy {
 
-  plan: any;
-  query: string;
   selectedPlan: any;
+
+  augmentedPlan: any;
+  formattedQuery: string;
 
   private unsubscribe: Subject<void> = new Subject();
 
@@ -23,8 +24,12 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.plan = this.planService.getExecutionPlan();
-    this.query = this.planService.getQuery();
+    const plan = this.planService.getExecutionPlan();
+    const query = this.planService.getQuery();
+    this.planService.getAugmentedPlanStatistics(plan, query).then(response => {
+      this.augmentedPlan = response['plan'];
+      this.formattedQuery = response['query'];
+    });
   }
 
   ngOnDestroy() {
