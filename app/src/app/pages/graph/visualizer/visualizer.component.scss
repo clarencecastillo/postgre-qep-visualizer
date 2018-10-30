@@ -1,0 +1,22 @@
+.container-fluid {
+  position: relative;
+  height: 100%;
+}
+
+app-node {
+  height: 100%;
+  padding: 3rem 0;
+  flex: 1;
+  background-color: #1e1e1e;
+  width: 100%;
+  overflow: scroll;
+  zoom: 0.9;
+}
+
+.visualizer-backdrop {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  top: 0;
+}
