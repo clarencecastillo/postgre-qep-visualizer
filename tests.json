@@ -1,0 +1,191 @@
+[
+  {
+    "Query": "SELECT PUBLICATION.pubTitle FROM PUBLICATION WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017",
+    "Test Case": "Seq Scan",
+    "Execution Plan": {
+      "Plan": {
+      "Node Type": "Seq Scan",
+      "Parallel Aware": false,
+      "Relation Name": "publication",
+      "Schema": "public",
+      "Alias": "publication",
+      "Startup Cost": 0.00,
+      "Total Cost": 35738.79,
+      "Plan Rows": 847367,
+      "Plan Width": 75,
+      "Actual Startup Time": 0.673,
+      "Actual Total Time": 1274.170,
+      "Actual Rows": 844485,
+      "Actual Loops": 1,
+      "Output": ["pubtitle"],
+      "Filter": "((publication.pubyear >= 2000) AND (publication.pubyear <= 2017))",
+      "Rows Removed by Filter": 226168,
+      "Shared Hit Blocks": 9954,
+      "Shared Read Blocks": 9725,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 2.674,
+    "Triggers": [
+    ],
+    "Execution Time": 1330.936
+    }
+  },
+
+  {
+    "Query": "SELECT PUBMONTH.pubKey FROM PUBMONTH WHERE PUBMONTH.pubKey = 'books/aw/AhoHU83'",
+    "Test Case": "Index Only Scan (text)",
+    "Execution Plan":
+    [
+  {
+    "Plan": {
+      "Node Type": "Index Only Scan",
+      "Parallel Aware": false,
+      "Scan Direction": "Forward",
+      "Index Name": "pubmonth_pkey",
+      "Relation Name": "pubmonth",
+      "Schema": "public",
+      "Alias": "pubmonth",
+      "Startup Cost": 0.29,
+      "Total Cost": 8.30,
+      "Plan Rows": 1,
+      "Plan Width": 17,
+      "Actual Startup Time": 0.448,
+      "Actual Total Time": 0.448,
+      "Actual Rows": 0,
+      "Actual Loops": 1,
+      "Output": ["pubkey"],
+      "Index Cond": "(pubmonth.pubkey = 'books/aw/AhoHU83'::text)",
+      "Rows Removed by Index Recheck": 0,
+      "Heap Fetches": 0,
+      "Shared Hit Blocks": 0,
+      "Shared Read Blocks": 2,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 2.957,
+    "Triggers": [
+    ],
+    "Execution Time": 0.466
+  }
+]
+  },
+
+  {
+    "Query": "SELECT PUBLISHER.publisherid FROM PUBLISHER WHERE PUBLISHER.publisherid < 10 OR PUBLISHER.publisherid > 100",
+    "Test Case": "Index Only Scan (number)",
+    "Execution Plan": {
+    "Plan": {
+      "Node Type": "Index Only Scan",
+      "Parallel Aware": false,
+      "Scan Direction": "Forward",
+      "Index Name": "pubmonth_pkey",
+      "Relation Name": "pubmonth",
+      "Schema": "public",
+      "Alias": "pubmonth",
+      "Startup Cost": 0.29,
+      "Total Cost": 8.30,
+      "Plan Rows": 1,
+      "Plan Width": 17,
+      "Actual Startup Time": 0.448,
+      "Actual Total Time": 0.448,
+      "Actual Rows": 0,
+      "Actual Loops": 1,
+      "Output": ["pubkey"],
+      "Index Cond": "(pubmonth.pubkey = 'books/aw/AhoHU83'::text)",
+      "Rows Removed by Index Recheck": 0,
+      "Heap Fetches": 0,
+      "Shared Hit Blocks": 0,
+      "Shared Read Blocks": 2,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 2.957,
+    "Triggers": [
+    ],
+    "Execution Time": 0.466
+    }
+  },
+
+  {
+    "Query": "SELECT PUBLICATION.pubTitle FROM PUBLICATION WHERE PUBLICATION.pubKey = 'books/aw/AhoHU83' AND PUBLICATION.pubYear <= 2017",
+    "Test Case": "Index Scan",
+    "Execution Plan": {
+
+    }
+  },
+
+  {
+    "Query": "SELECT PUBLICATION.pubKey FROM PUBLICATION WHERE PUBLICATION.pubKey = 'books/aw/AhoHU83' OR PUBLICATION.pubKey = 'books/aw/ArnoldG99'",
+    "Test Case": "Bitmap Index Scan",
+    "Execution Plan": {
+
+    }
+  },
+
+  {
+    "Query": "SELECT PUBLICATION.pubKey FROM PUBLICATION WHERE PUBLICATION.pubKey = 'books/aw/AhoHU83' OR PUBLICATION.pubKey = 'books/aw/ArnoldG99'",
+    "Test Case": "Bitmap Heap Scan",
+    "Execution Plan": {
+
+    }
+  },
+
+  {
+    "Query": "SELECT PROCEEDING.proceedbooktitle, INPROCEEDING.inprobooktitle FROM INPROCEEDING, PROCEEDING WHERE PROCEEDING.pubKey = INPROCEEDING.inproCrossRef;",
+    "Test Case": "Hash Join",
+    "Execution Plan": {
+
+    }
+  },
+
+  {
+    "Query":"SELECT PUBLICATION.pubType, PUBLICATION.pubYear, COUNT(*) FROM PUBLICATION GROUP BY PUBLICATION.pubType, PUBLICATION.pubYear;",
+    "Test Case": "Aggregate",
+    "Execution Plan": {
+
+    }
+  },
+
+  {
+    "Query": "SELECT PUBLICATION.pubYear, PUBLICATION.pubType, COUNT(*) FROM PUBLICATION GROUP BY PUBLICATION.pubType, PUBLICATION.pubYear ORDER BY COUNT(*) DESC, PUBLICATION.pubYear;",
+    "Test Case": "Sort",
+    "Execution Plan": {
+
+    }
+  },
+
+  {
+    "Query":"SELECT DISTINCT PUBLICATION.pubKey FROM PUBLICATION;",
+    "Test Case": "Unique",
+    "Execution Plan": {
+
+    }
+  },
+
+  {
+    "Query":"",
+    "Test Case": "",
+    "Execution Plan": {
+
+    }
+  },
+]

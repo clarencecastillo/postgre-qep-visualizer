@@ -2,6 +2,8 @@ import psycopg2
 import json
 # from queries import *
 
+read_json('tests.json')
+
 import re
 
 connection = "dbname='dblpDB_quarter' user='anqitu' host='localhost' password='dbpass'"
