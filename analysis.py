@@ -1,5 +1,5 @@
+from utils import format
 import re
-import sqlparse
 
 QUERY_LIMIT_REGEX = r"\bLIMIT\s+{0}"
 QUERY_SORT_REGEX = r"ORDER BY\s+{0}"
@@ -22,7 +22,7 @@ NODE_DESCRIPTIONS = {
 }
 
 def analyze(execution_plan, query):
-    formatted_query = sqlparse.format(query, reindent=True, indent_tabs=True).upper()
+    formatted_query = format(query)
     analyze_plan(execution_plan['Plan'], formatted_query)
     return execution_plan, formatted_query
 
