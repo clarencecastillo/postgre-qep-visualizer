@@ -11,3 +11,28 @@ table {
     word-wrap: break-word;
   }
 }
+
+.container-fluid {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .card {
+    flex-shrink: 0;
+  }
+
+  .block {
+    flex: 1;
+    overflow: scroll;
+  }
+
+}
+
+.query {
+  background: #1e1e1e;
+  padding: 1rem;
+
+  pre {
+    margin: 0;
+  }
+}

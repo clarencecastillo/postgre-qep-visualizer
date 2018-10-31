@@ -14,6 +14,8 @@ import { FooterComponent } from './footer/footer.component';
 import { RouterModule } from '@angular/router';
 import { InspectorComponent } from './graph/inspector/inspector.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { PlanComponent } from './graph/visualizer/node/plan/plan.component';
+import { PipesModule } from '../pipes/pipes.module';
 
 const COMPONENTS = [
   HomeComponent,
@@ -23,13 +25,14 @@ const COMPONENTS = [
   VisualizerComponent,
   NodeComponent,
   GraphComponent,
-  FooterComponent
+  FooterComponent,
+  InspectorComponent,
+  PlanComponent
 ];
 
 @NgModule({
   declarations: [
-    ...COMPONENTS,
-    InspectorComponent
+    ...COMPONENTS
   ],
   imports: [
     CommonModule,
@@ -37,7 +40,8 @@ const COMPONENTS = [
     NgbModule,
     MomentModule,
     RouterModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    PipesModule
   ],
   exports: [
     NavigationComponent,

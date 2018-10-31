@@ -13,6 +13,7 @@ export class InspectorComponent implements OnInit {
   private readonly CALCULATED_ATTRIBUTES = ['Actual Duration'];
 
   @Input() plan: any;
+  @Input() query: string;
   attributes: string[];
 
   constructor(private planService: PlanService) { }
@@ -28,8 +29,6 @@ export class InspectorComponent implements OnInit {
       node.selectedPlanIndex = -1;
     });
     this.planService.selectPlan(this.plan['Plans'][index]);
-    // this.selected = true;
-    // this.selectedPlanIndex = index;
   }
 
 }

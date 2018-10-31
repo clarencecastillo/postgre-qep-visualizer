@@ -1,35 +1,58 @@
 <div class="container-fluid">
   <h6 class="text-light"><b>Node Inspector</b></h6>
-  <table class="table table-hover text-light table-sm table-borderless">
-    <thead>
-      <tr>
-        <th scope="col">Key</th>
-        <th scope="col">Value</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let attribute of attributes">
-        <td scope="row">{{attribute}}</td>
-        <td class="text-muted">{{plan[attribute]}}</td>
-      </tr>
-      <tr>
-        <td scope="row">Plans</td>
-        <td class="text-muted" *ngIf="plan['Plans']">
-          <span class="btn badge badge-secondary mr-1" *ngFor="let plan of plan['Plans']; let i = index" (click)="select(i)">{{plan['Node Type']}}</span>
-        </td>
-        <td class="text-muted" *ngIf="!plan['Plans']">No Plans</td>
-      </tr>
-      <tr *ngFor="let attribute of CALCULATED_ATTRIBUTES">
-        <td scope="row">*{{attribute}}</td>
-        <td class="text-muted">{{plan[attribute] | number: '1.2-2'}}</td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="2">
-          <small class="text-secondary">*Calculated attributes</small>
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+  <div class="card mt-4 mb-4">
+    <div class="card-body">
+      <h5 class="card-title d-flex justify-content-between m-0">
+        <div class="text-sm node-type">{{plan['Node Type']}}</div>
+        <div class="text-sm">{{plan['Actual Duration'] | number: '1.2-2'}}ms</div>
+      </h5>
+      <div [ngSwitch]="plan['Node Type']" class="node-summary pb-2">
+        <small *ngSwitchCase="'Sort'" class="text-secondary">
+          by <code>{{plan['Sort Key']}}</code>
+        </small>
+        <small *ngSwitchCase="'Aggregate'" class="text-secondary">
+          by <code>{{plan['Group Key']}}</code>
+        </small>
+        <small *ngSwitchCase="'Hash Join'" class="text-secondary">
+          <code>{{plan['Join Type']}}</code> join on <code>{{plan['Hash Cond']}}</code>
+        </small>
+        <small *ngSwitchCase="'Seq Scan'" class="text-secondary">
+          on <code>{{plan['Schema']}}.{{plan['Relation Name']}} ({{plan['Alias']}})</code>
+        </small>
+      </div>
+      <small class="card-text"><em>{{plan['Description']}}</em></small>
+    </div>
+  </div>
+  <div class="block">
+    <table class="table table-hover text-light table-sm table-borderless">
+      <thead>
+        <tr>
+          <th scope="col">Key</th>
+          <th scope="col">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let attribute of attributes">
+          <td scope="row">{{attribute}}</td>
+          <td class="text-muted">{{plan[attribute]}}</td>
+        </tr>
+        <tr>
+          <td scope="row">Plans</td>
+          <td class="text-muted" *ngIf="plan['Plans']">
+            <span class="btn badge badge-secondary mr-1" *ngFor="let plan of plan['Plans']; let i = index" (click)="select(i)">{{plan['Node Type']}}</span>
+          </td>
+          <td class="text-muted" *ngIf="!plan['Plans']">No Plans</td>
+        </tr>
+        <tr *ngFor="let attribute of CALCULATED_ATTRIBUTES">
+          <td scope="row">*{{attribute}}</td>
+          <td class="text-muted">{{plan[attribute] | number: '1.2-2'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <small class="text-secondary p-1 pt-2 pb-3">*Calculated attributes</small>
+  <small class="query">
+    <pre class="text-light" innerHTML="{{query | highlight : plan['Query']}}" *ngIf="plan['Query'] != ''"></pre>
+    <pre class="text-light" *ngIf="plan['Query'] == ''">{{query}}</pre>
+  </small>
 </div>
