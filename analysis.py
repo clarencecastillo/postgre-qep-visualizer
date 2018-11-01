@@ -1,4 +1,4 @@
-from utils import format
+from utils import format, read_json
 import re
 
 QUERY_LIMIT_REGEX = r"\bLIMIT\s+{0}"
@@ -25,6 +25,7 @@ def analyze(execution_plan, query):
     formatted_query = format(query)
     analyze_plan(execution_plan['Plan'], formatted_query)
     execution_plan['Longest Duration'] = get_longest_duration(execution_plan['Plan'])
+    find_slowest_node(execution_plan['Plan'], execution_plan['Longest Duration'])
     return execution_plan, formatted_query
 
 def get_node_description(plan):
@@ -56,6 +57,14 @@ def get_longest_duration(plan):
         return duration
     return duration
 
+def find_slowest_node(plan, longest_duration):
+    plan['Is Slowest'] = False
+    if plan['Actual Duration'] == longest_duration:
+        plan['Is Slowest'] = True
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            find_slowest_node(sub_plan, longest_duration)
 
 def analyze_plan(plan, query):
     plan['Query'] = get_query_components(plan, query)
@@ -141,31 +150,3 @@ def parse_seq_scan(plan, query):
         regex += "WHERE(.*\n)*(?<!\t)"
     search = re.search(regex, query, re.IGNORECASE)
     return [search[0]] if search else []
-
-
-
-from utils import format
-from analysis import *
-import json
-
-def read_json(file_path):
-    with open(file_path, 'r') as f:
-        content = json.load(f)
-    return content
-
-tests = read_json('tests.json')
-
-print('Available Test Cases:')
-for i, test in enumerate(tests):
-    print(str(i) + '. ' + test['Test Case'])
-
-test = tests[-2]
-test_case = test['Test Case']
-query = test['Query']
-execution_plan = test['Execution Plan']
-print('Test Case: \n' + test_case + '\n')
-print('Input Query: \n' + query + '\n')
-print('Formatted Query: \n' + format(query) + '\n')
-
-e,q = analyze(execution_plan, query)
-e['Longest Duration']

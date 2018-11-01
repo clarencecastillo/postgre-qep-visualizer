@@ -7,12 +7,16 @@ print('Available Test Cases:')
 for i, test in enumerate(tests):
     print(str(i) + '. ' + test['Test Case'])
 
-test = tests[0]
+test = tests[-2]
 test_case = test['Test Case']
 query = test['Query']
 execution_plan = test['Execution Plan']
 print('Test Case: \n' + test_case + '\n')
 print('Input Query: \n' + query + '\n')
 print('Formatted Query: \n' + format(query) + '\n')
+
+format(query)
+'SELECT DISTINCT PUBLICATION.PUBKEY\nFROM PUBLICATION'
+execution_plan
 
 analyze(execution_plan, query)

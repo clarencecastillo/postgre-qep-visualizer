@@ -28,11 +28,52 @@
         "Local Dirtied Blocks": 0,
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0
+        "Temp Written Blocks": 0,
+        "Expected Query": ["FROM PUBLICATION\nWHERE PUBLICATION.PUBYEAR >= 2000\n\t\tAND PUBLICATION.PUBYEAR <= 2017"]
       },
       "Planning Time": 2.674,
       "Triggers": [],
       "Execution Time": 1330.936
+    }
+  },
+
+  {
+    "Query": "SELECT pubTitle FROM PUBLICATION WHERE pubYear >= 2000 AND pubYear <= 2017",
+    "Test Case": "Seq Scan (No Table Name)",
+    "Execution Plan": {
+      "Plan": {
+        "Node Type": "Seq Scan",
+        "Parallel Aware": false,
+        "Relation Name": "publication",
+        "Schema": "public",
+        "Alias": "publication",
+        "Startup Cost": 0.00,
+        "Total Cost": 35738.79,
+        "Plan Rows": 847367,
+        "Plan Width": 75,
+        "Actual Startup Time": 0.011,
+        "Actual Total Time": 712.502,
+        "Actual Rows": 844485,
+        "Actual Loops": 1,
+        "Output": ["pubtitle"],
+        "Filter": "((publication.pubyear >= 2000) AND (publication.pubyear <= 2017))",
+        "Rows Removed by Filter": 226168,
+        "Shared Hit Blocks": 16197,
+        "Shared Read Blocks": 3482,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Expected Query": ["FROM PUBLICATION\nWHERE PUBYEAR >= 2000\n\t\tAND PUBYEAR <= 2017"]
+      },
+      "Planning Time": 0.073,
+      "Triggers": [
+      ],
+      "Execution Time": 765.420
     }
   },
 
@@ -66,7 +107,8 @@
         "Local Dirtied Blocks": 0,
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0
+        "Temp Written Blocks": 0,
+        "Expected Query": ["FROM PUBLICATION\nWHERE PUBLICATION.PUBYEAR >= 2000\n\t\tAND (PUBLICATION.PUBTYPE = 'BOOK'\n\t\t\t\t\t\t\tOR PUBLICATION.PUBTYPE = 'ARTICLE')"]
       },
       "Planning Time": 0.047,
       "Triggers": [],
@@ -103,6 +145,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["SELECT PUBLICATION.pubKey, PUBLICATION.pubTitle"],
         "Plans": [{
           "Node Type": "Seq Scan",
           "Parent Relationship": "Outer",
@@ -131,6 +174,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["FROM PUBLICATION\nWHERE PUBLICATION.PUBYEAR >= 2000\n\t\tAND PUBLICATION.PUBTITLE LIKE '%DATA%'"],
           "Workers": [{
               "Worker Number": 0,
               "Actual Startup Time": 0.034,
@@ -207,7 +251,8 @@
         "Local Dirtied Blocks": 0,
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0
+        "Temp Written Blocks": 0,
+        "Expected Query": ["FROM PUBMONTH\nWHERE PUBMONTH.PUBKEY = 'BOOKS/AW/AHOHU83'"]
       },
       "Planning Time": 0.065,
       "Triggers": [],
@@ -248,7 +293,8 @@
         "Local Dirtied Blocks": 0,
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0
+        "Temp Written Blocks": 0,
+        "Expected Query": ["FROM PUBLISHER\nWHERE PUBLISHER.PUBLISHERID < 10"]
       },
       "Planning Time": 0.073,
       "Triggers": [],
@@ -290,7 +336,8 @@
         "Local Dirtied Blocks": 0,
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0
+        "Temp Written Blocks": 0,
+        "Expected Query": ["FROM PUBLICATION\nWHERE PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'\n\t\tAND PUBLICATION.PUBYEAR <= 2017"]
       },
       "Planning Time": 0.062,
       "Triggers": [],
@@ -300,7 +347,7 @@
 
   {
     "Query": "SELECT * FROM PUBLICATION WHERE PUBLICATION.pubKey = 'books/aw/AhoHU83' OR PUBLICATION.pubKey = 'books/aw/ArnoldG99'",
-    "Test Case": "Bitmap Index Scan",
+    "Test Case": "Bitmap Index Scan & Bitmap Heap Scan",
     "Execution Plan": {
       "Plan": {
         "Node Type": "Bitmap Heap Scan",
@@ -331,6 +378,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["FROM PUBLICATION\nWHERE PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'\n\t\tOR PUBLICATION.PUBKEY = 'BOOKS/AW/ARNOLDG99'"],
         "Plans": [{
           "Node Type": "BitmapOr",
           "Parent Relationship": "Outer",
@@ -353,6 +401,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": [],
           "Plans": [{
               "Node Type": "Bitmap Index Scan",
               "Parent Relationship": "Member",
@@ -376,7 +425,8 @@
               "Local Dirtied Blocks": 0,
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
-              "Temp Written Blocks": 0
+              "Temp Written Blocks": 0,
+              "Expected Query": ["PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"]
             },
             {
               "Node Type": "Bitmap Index Scan",
@@ -401,121 +451,8 @@
               "Local Dirtied Blocks": 0,
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
-              "Temp Written Blocks": 0
-            }
-          ]
-        }]
-      },
-      "Planning Time": 0.063,
-      "Triggers": [],
-      "Execution Time": 0.092
-    }
-  },
-
-  {
-    "Query": "SELECT PUBLICATION.pubKey FROM PUBLICATION WHERE PUBLICATION.pubKey = 'books/aw/AhoHU83' OR PUBLICATION.pubKey = 'books/aw/ArnoldG99'",
-    "Test Case": "Bitmap Heap Scan",
-    "Execution Plan": {
-      "Plan": {
-        "Node Type": "Bitmap Heap Scan",
-        "Parallel Aware": false,
-        "Relation Name": "publication",
-        "Schema": "public",
-        "Alias": "publication",
-        "Startup Cost": 8.87,
-        "Total Cost": 16.84,
-        "Plan Rows": 2,
-        "Plan Width": 118,
-        "Actual Startup Time": 0.067,
-        "Actual Total Time": 0.069,
-        "Actual Rows": 2,
-        "Actual Loops": 1,
-        "Output": ["pubkey", "pubtitle", "pubyear", "pubmdate", "pubtype", "publisherid"],
-        "Recheck Cond": "(((publication.pubkey)::text = 'books/aw/AhoHU83'::text) OR ((publication.pubkey)::text = 'books/aw/ArnoldG99'::text))",
-        "Rows Removed by Index Recheck": 0,
-        "Exact Heap Blocks": 2,
-        "Lossy Heap Blocks": 0,
-        "Shared Hit Blocks": 8,
-        "Shared Read Blocks": 0,
-        "Shared Dirtied Blocks": 0,
-        "Shared Written Blocks": 0,
-        "Local Hit Blocks": 0,
-        "Local Read Blocks": 0,
-        "Local Dirtied Blocks": 0,
-        "Local Written Blocks": 0,
-        "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0,
-        "Plans": [{
-          "Node Type": "BitmapOr",
-          "Parent Relationship": "Outer",
-          "Parallel Aware": false,
-          "Startup Cost": 8.87,
-          "Total Cost": 8.87,
-          "Plan Rows": 2,
-          "Plan Width": 0,
-          "Actual Startup Time": 0.063,
-          "Actual Total Time": 0.063,
-          "Actual Rows": 0,
-          "Actual Loops": 1,
-          "Shared Hit Blocks": 6,
-          "Shared Read Blocks": 0,
-          "Shared Dirtied Blocks": 0,
-          "Shared Written Blocks": 0,
-          "Local Hit Blocks": 0,
-          "Local Read Blocks": 0,
-          "Local Dirtied Blocks": 0,
-          "Local Written Blocks": 0,
-          "Temp Read Blocks": 0,
-          "Temp Written Blocks": 0,
-          "Plans": [{
-              "Node Type": "Bitmap Index Scan",
-              "Parent Relationship": "Member",
-              "Parallel Aware": false,
-              "Index Name": "publication_pkey",
-              "Startup Cost": 0.00,
-              "Total Cost": 4.44,
-              "Plan Rows": 1,
-              "Plan Width": 0,
-              "Actual Startup Time": 0.037,
-              "Actual Total Time": 0.037,
-              "Actual Rows": 1,
-              "Actual Loops": 1,
-              "Index Cond": "((publication.pubkey)::text = 'books/aw/AhoHU83'::text)",
-              "Shared Hit Blocks": 3,
-              "Shared Read Blocks": 0,
-              "Shared Dirtied Blocks": 0,
-              "Shared Written Blocks": 0,
-              "Local Hit Blocks": 0,
-              "Local Read Blocks": 0,
-              "Local Dirtied Blocks": 0,
-              "Local Written Blocks": 0,
-              "Temp Read Blocks": 0,
-              "Temp Written Blocks": 0
-            },
-            {
-              "Node Type": "Bitmap Index Scan",
-              "Parent Relationship": "Member",
-              "Parallel Aware": false,
-              "Index Name": "publication_pkey",
-              "Startup Cost": 0.00,
-              "Total Cost": 4.44,
-              "Plan Rows": 1,
-              "Plan Width": 0,
-              "Actual Startup Time": 0.025,
-              "Actual Total Time": 0.025,
-              "Actual Rows": 1,
-              "Actual Loops": 1,
-              "Index Cond": "((publication.pubkey)::text = 'books/aw/ArnoldG99'::text)",
-              "Shared Hit Blocks": 3,
-              "Shared Read Blocks": 0,
-              "Shared Dirtied Blocks": 0,
-              "Shared Written Blocks": 0,
-              "Local Hit Blocks": 0,
-              "Local Read Blocks": 0,
-              "Local Dirtied Blocks": 0,
-              "Local Written Blocks": 0,
-              "Temp Read Blocks": 0,
-              "Temp Written Blocks": 0
+              "Temp Written Blocks": 0,
+              "Expected Query": ["PUBLICATION.PUBKEY = 'BOOKS/AW/ARNOLDG99'"]
             }
           ]
         }]
@@ -555,6 +492,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"],
         "Plans": [{
             "Node Type": "Seq Scan",
             "Parent Relationship": "Outer",
@@ -580,7 +518,8 @@
             "Local Dirtied Blocks": 0,
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
-            "Temp Written Blocks": 0
+            "Temp Written Blocks": 0,
+            "Expected Query": ["FROM INPROCEEDING"]
           },
           {
             "Node Type": "Hash",
@@ -610,6 +549,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": [""],
             "Plans": [{
               "Node Type": "Seq Scan",
               "Parent Relationship": "Outer",
@@ -635,7 +575,8 @@
               "Local Dirtied Blocks": 0,
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
-              "Temp Written Blocks": 0
+              "Temp Written Blocks": 0,
+              "Expected Query": ["\tPROCEEDING"]
             }]
           }
         ]
@@ -675,6 +616,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
         "Plans": [{
           "Node Type": "Sort",
           "Parent Relationship": "Outer",
@@ -702,6 +644,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
           "Plans": [{
             "Node Type": "Gather",
             "Parent Relationship": "Outer",
@@ -728,6 +671,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": ["SELECT PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR,\n\tCOUNT(*)"],
             "Plans": [{
               "Node Type": "Aggregate",
               "Strategy": "Hashed",
@@ -754,6 +698,7 @@
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
+              "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
               "Workers": [{
                   "Worker Number": 0,
                   "Actual Startup Time": 235.618,
@@ -815,6 +760,7 @@
                 "Local Written Blocks": 0,
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
+                "Expected Query": ["FROM PUBLICATION"],
                 "Workers": [{
                     "Worker Number": 0,
                     "Actual Startup Time": 0.073,
@@ -891,6 +837,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["ORDER BY COUNT(*)"],
         "Plans": [{
           "Node Type": "Aggregate",
           "Strategy": "Sorted",
@@ -917,6 +864,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
           "Plans": [{
             "Node Type": "Sort",
             "Parent Relationship": "Outer",
@@ -944,6 +892,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
             "Plans": [{
               "Node Type": "Gather",
               "Parent Relationship": "Outer",
@@ -970,6 +919,7 @@
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
+              "Expected Query": ["SELECT PUBLICATION.PUBYEAR,\n\tPUBLICATION.PUBTYPE,\n\tCOUNT(*)"],
               "Plans": [{
                 "Node Type": "Aggregate",
                 "Strategy": "Hashed",
@@ -996,6 +946,7 @@
                 "Local Written Blocks": 0,
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
+                "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
                 "Workers": [{
                     "Worker Number": 0,
                     "Actual Startup Time": 226.845,
@@ -1057,6 +1008,7 @@
                   "Local Written Blocks": 0,
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
+                  "Expected Query": ["FROM PUBLICATION"],
                   "Workers": [{
                       "Worker Number": 0,
                       "Actual Startup Time": 0.124,
@@ -1134,6 +1086,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["ORDER BY COUNT(*),\n\tPUBLICATION.PUBYEAR"],
         "Plans": [{
           "Node Type": "Aggregate",
           "Strategy": "Sorted",
@@ -1160,6 +1113,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
           "Plans": [{
             "Node Type": "Sort",
             "Parent Relationship": "Outer",
@@ -1187,6 +1141,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
             "Plans": [{
               "Node Type": "Gather",
               "Parent Relationship": "Outer",
@@ -1213,6 +1168,7 @@
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
+              "Expected Query": ["SELECT PUBLICATION.PUBYEAR,\n\tPUBLICATION.PUBTYPE,\n\tCOUNT(*)"],
               "Plans": [{
                 "Node Type": "Aggregate",
                 "Strategy": "Hashed",
@@ -1239,6 +1195,7 @@
                 "Local Written Blocks": 0,
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
+                "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
                 "Workers": [{
                     "Worker Number": 0,
                     "Actual Startup Time": 226.790,
@@ -1300,6 +1257,7 @@
                   "Local Written Blocks": 0,
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
+                  "Expected Query": ["FROM PUBLICATION"],
                   "Workers": [{
                       "Worker Number": 0,
                       "Actual Startup Time": 0.074,
@@ -1377,6 +1335,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["ORDER BY COUNT(*) DESC, PUBLICATION.PUBYEAR"],
         "Plans": [{
           "Node Type": "Aggregate",
           "Strategy": "Sorted",
@@ -1403,6 +1362,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
           "Plans": [{
             "Node Type": "Sort",
             "Parent Relationship": "Outer",
@@ -1430,6 +1390,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
             "Plans": [{
               "Node Type": "Gather",
               "Parent Relationship": "Outer",
@@ -1456,6 +1417,7 @@
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
+              "Expected Query": ["SELECT PUBLICATION.PUBYEAR,\n\tPUBLICATION.PUBTYPE,\n\tCOUNT(*)"],
               "Plans": [{
                 "Node Type": "Aggregate",
                 "Strategy": "Hashed",
@@ -1482,6 +1444,7 @@
                 "Local Written Blocks": 0,
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
+                "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
                 "Workers": [{
                     "Worker Number": 0,
                     "Actual Startup Time": 228.132,
@@ -1543,6 +1506,7 @@
                   "Local Written Blocks": 0,
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
+                  "Expected Query": ["FROM PUBLICATION"],
                   "Workers": [{
                       "Worker Number": 0,
                       "Actual Startup Time": 0.076,
@@ -1620,6 +1584,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["ORDER BY COUNT(*) DESC, PUBLICATION.PUBYEAR ASC"],
         "Plans": [{
           "Node Type": "Aggregate",
           "Strategy": "Sorted",
@@ -1646,6 +1611,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
           "Plans": [{
             "Node Type": "Sort",
             "Parent Relationship": "Outer",
@@ -1673,6 +1639,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
             "Plans": [{
               "Node Type": "Gather",
               "Parent Relationship": "Outer",
@@ -1699,6 +1666,7 @@
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
+              "Expected Query": ["SELECT PUBLICATION.PUBYEAR,\n\tPUBLICATION.PUBTYPE,\n\tCOUNT(*)"],
               "Plans": [{
                 "Node Type": "Aggregate",
                 "Strategy": "Hashed",
@@ -1725,6 +1693,7 @@
                 "Local Written Blocks": 0,
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
+                "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
                 "Workers": [{
                     "Worker Number": 0,
                     "Actual Startup Time": 226.543,
@@ -1786,6 +1755,7 @@
                   "Local Written Blocks": 0,
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
+                  "Expected Query": ["FROM PUBLICATION"],
                   "Workers": [{
                       "Worker Number": 0,
                       "Actual Startup Time": 0.037,
@@ -1863,6 +1833,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["ORDER BY PUBCOUNT DESC,\n\tPUBLICATION.PUBYEAR"],
         "Plans": [{
           "Node Type": "Aggregate",
           "Strategy": "Sorted",
@@ -1889,6 +1860,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
           "Plans": [{
             "Node Type": "Sort",
             "Parent Relationship": "Outer",
@@ -1916,6 +1888,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
             "Plans": [{
               "Node Type": "Gather",
               "Parent Relationship": "Outer",
@@ -1942,6 +1915,7 @@
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
+              "Expected Query": ["SELECT PUBLICATION.PUBYEAR,\n\tPUBLICATION.PUBTYPE,\n\tCOUNT(*) AS PUBCOUNT"],
               "Plans": [{
                 "Node Type": "Aggregate",
                 "Strategy": "Hashed",
@@ -1968,6 +1942,7 @@
                 "Local Written Blocks": 0,
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
+                "Expected Query": ["GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"],
                 "Workers": [{
                     "Worker Number": 0,
                     "Actual Startup Time": 224.106,
@@ -2029,6 +2004,7 @@
                   "Local Written Blocks": 0,
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
+                  "Expected Query": ["FROM PUBLICATION"],
                   "Workers": [{
                       "Worker Number": 0,
                       "Actual Startup Time": 0.108,
@@ -2106,6 +2082,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["ORDER BY PUBCOUNT DESC,\n\tPUBYEAR"],
         "Plans": [{
           "Node Type": "Aggregate",
           "Strategy": "Sorted",
@@ -2132,6 +2109,7 @@
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
+          "Expected Query": ["GROUP BY PUBTYPE,\n\tPUBYEAR"],
           "Plans": [{
             "Node Type": "Sort",
             "Parent Relationship": "Outer",
@@ -2159,6 +2137,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
+            "Expected Query": ["GROUP BY PUBTYPE,\n\tPUBYEAR"],
             "Plans": [{
               "Node Type": "Gather",
               "Parent Relationship": "Outer",
@@ -2185,6 +2164,7 @@
               "Local Written Blocks": 0,
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
+              "Expected Query": ["SELECT PUBYEAR,\n\tPUBTYPE,\n\tCOUNT(*) AS PUBCOUNT"],
               "Plans": [{
                 "Node Type": "Aggregate",
                 "Strategy": "Hashed",
@@ -2211,6 +2191,7 @@
                 "Local Written Blocks": 0,
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
+                "Expected Query": ["GROUP BY PUBTYPE,\n\tPUBYEAR"],
                 "Workers": [{
                     "Worker Number": 0,
                     "Actual Startup Time": 223.279,
@@ -2272,6 +2253,7 @@
                   "Local Written Blocks": 0,
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
+                  "Expected Query": ["FROM PUBLICATION"],
                   "Workers": [{
                       "Worker Number": 0,
                       "Actual Startup Time": 0.078,
@@ -2345,6 +2327,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["SELECT DISTINCT PUBLICATION.PUBKEY"],
         "Plans": [{
           "Node Type": "Index Only Scan",
           "Parent Relationship": "Outer",
@@ -2373,7 +2356,8 @@
           "Local Dirtied Blocks": 0,
           "Local Written Blocks": 0,
           "Temp Read Blocks": 0,
-          "Temp Written Blocks": 0
+          "Temp Written Blocks": 0,
+          "Expected Query": ["FROM PUBLICATION"]
         }]
       },
       "Planning Time": 0.054,
