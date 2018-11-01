@@ -157,7 +157,10 @@ def parse_seq_scan(plan, query):
             conditions = conditions + key_conditions
 
     for condition in conditions:
-        print(condition)
+        condition_regex = re.sub(r"\w+\.", r"(\\w+)?", condition)
+        search = re.search(condition_regex, query, re.IGNORECASE)
+        if search:
+            query_components.append(search[0])
     return query_components
 
 def extract_conditions(layers):

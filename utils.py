@@ -1,5 +1,6 @@
 import sqlparse
 import json
+import re
 
 def format(query):
     return sqlparse.format(query, reindent=True, indent_tabs=True).upper()

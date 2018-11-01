@@ -29,7 +29,10 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
-        "Expected Query": ["FROM PUBLICATION\nWHERE PUBLICATION.PUBYEAR >= 2000\n\t\tAND PUBLICATION.PUBYEAR <= 2017"]
+        "Expected Query": [{
+          "Index": ?,
+          "Query": "PUBLICATION"
+          }, "PUBLICATION.PUBYEAR >= 2000", "PUBLICATION.PUBYEAR <= 2017"]
       },
       "Planning Time": 2.674,
       "Triggers": [],
@@ -107,7 +110,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
-        "Expected Query": ["FROM PUBLICATION\nWHERE PUBYEAR >= 2000\n\t\tAND PUBYEAR <= 2017"]
+        "Expected Query": ["PUBLICATION", "PUBYEAR >= 2000", "PUBYEAR <= 2017"]
       },
       "Planning Time": 0.073,
       "Triggers": [],
@@ -367,7 +370,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
-        "Expected Query": ["FROM PUBMONTH\nWHERE PUBMONTH.PUBKEY = 'BOOKS/AW/AHOHU83'"]
+        "Expected Query": ["PUBMONTH", "PUBMONTH.PUBKEY = 'BOOKS/AW/AHOHU83'"]
       },
       "Planning Time": 0.065,
       "Triggers": [],
@@ -607,7 +610,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
-        "Expected Query": ["PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"],
+        "Expected Query": ["INPROCEEDING", "PROCEEDING", "PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"],
         "Plans": [{
             "Node Type": "Seq Scan",
             "Parent Relationship": "Outer",
@@ -634,7 +637,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
-            "Expected Query": ["FROM INPROCEEDING"]
+            "Expected Query": ["INPROCEEDING"]
           },
           {
             "Node Type": "Hash",
@@ -664,7 +667,7 @@
             "Local Written Blocks": 0,
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
-            "Expected Query": [""],
+            "Expected Query": ["PROCEEDING"],
             "Plans": [{
               "Node Type": "Seq Scan",
               "Parent Relationship": "Outer",
@@ -731,6 +734,7 @@
         "Local Written Blocks": 0,
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
+        "Expected Query": ["PERSON"],
         "Plans": [
           {
             "Node Type": "Nested Loop",
