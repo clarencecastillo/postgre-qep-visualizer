@@ -1,10 +1,14 @@
-from utils import format, read_json
+from utils import format, read_json, parse_nested
 import re
 
 QUERY_LIMIT_REGEX = r"\bLIMIT\s+{0}"
 QUERY_SORT_REGEX = r"ORDER BY\s+{0}"
 QUERY_SORT_KEY_REGEX = r"{0}(\s+{1})?"
-QUERY_SCAN_REGEX = r"(FROM\s+)?{0}(\s+{1})?"
+QUERY_SCAN_REGEX = r"{0}(\s+{1})?"
+QUERY_SCAN_RELATION_REGEX = r"{0}(\s+{1})?"
+
+FILTERS_PAREN_REGEX = r"\(([\w\.]+)\)::[a-z]+"
+FILTERS_QUOTE_REGEX = r"'([\w\.]+)'::[a-z]+"
 
 NODE_DESCRIPTIONS = {
     'Seq Scan': 'Scans the entire relation as stored on disk.',
@@ -98,10 +102,6 @@ def get_query_components(plan, query):
     #     query_components = parse_merge_join(plan, query)
     # elif plan['Node Type'] == 'Aggregate':
     #     query_components = parse_aggregate(plan, query)
-    # elif plan['Node Type'] == 'Sort':
-    #     query_components = parse_sort(plan, query)
-    # elif plan['Node Type'] == 'Limit':
-    #     query_components = parse_limit(plan, query)
     # elif plan['Node Type'] == 'Unique':
     #     query_components = parse_unique(plan, query)
     # else:
@@ -143,10 +143,33 @@ def parse_limit(plan, query):
     search = re.search(regex, query, re.IGNORECASE)
     return [search[0]] if search else []
 
-
 def parse_seq_scan(plan, query):
-    regex = QUERY_SCAN_REGEX.format(plan['Relation Name'], plan['Alias'])
-    if any(key in plan.keys() for key in ['Filter', 'Index Cond']):
-        regex += "WHERE(.*\n)*(?<!\t)"
-    search = re.search(regex, query, re.IGNORECASE)
-    return [search[0]] if search else []
+    query_components = []
+    if all(key in plan for key in ['Relation Name', 'Alias']):
+        relation_regex = QUERY_SCAN_RELATION_REGEX.format(plan['Relation Name'], plan['Alias'])
+        relation_search = re.search(relation_regex, query, re.IGNORECASE)
+        query_components.append(relation_search[0])
+
+    conditions = []
+    for key in ['Filter', 'Index Cond']:
+        if key in plan:
+            key_conditions = parse_filters(plan[key])
+            conditions = conditions + key_conditions
+
+    for condition in conditions:
+        print(condition)
+    return query_components
+
+def extract_conditions(layers):
+    conditions = []
+    if len(layers) == 1:
+        return [layers[0]] if isinstance(layers[0], str) else [extract_conditions(layers[0])]
+    for layer in layers:
+        if isinstance(layer, list):
+            conditions = conditions + extract_conditions(layer)
+    return conditions
+
+def parse_filters(filters):
+    filters = re.sub(FILTERS_PAREN_REGEX, "\g<1>", filters)
+    filters = re.sub(FILTERS_QUOTE_REGEX, "'\g<1>'",filters)
+    return extract_conditions(parse_nested(filters))
