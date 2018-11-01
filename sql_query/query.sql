@@ -1,9 +1,9 @@
 SET SESSION query_cache_type=0;
 
 -- Question 1
-SELECT PUBLICATION.pubType, COUNT(*) FROM PUBLICATION
-WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017
-GROUP BY PUBLICATION.pubType;
+SELECT pubType, COUNT(*) FROM PUBLICATION
+WHERE pubYear >= 2000 AND pubYear <= 2017
+GROUP BY pubType;
 
 -- Question 2
 SELECT CONFERENCES.conference, MAX(CONFERENCES.pubCount) AS pubMaxCount FROM (
