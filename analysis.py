@@ -6,6 +6,7 @@ QUERY_SORT_REGEX = r"ORDER BY\s+{0}"
 QUERY_SORT_KEY_REGEX = r"{0}(\s+{1})?"
 QUERY_SCAN_REGEX = r"{0}(\s+{1})?"
 QUERY_SCAN_RELATION_REGEX = r"{0}(\s+{1})?"
+QUERY_CLAUSE_REGEX = r'\n({0}.*\n(\t+.*\n)+)(?<!\t)'
 
 FILTERS_PAREN_REGEX = r"\(([\w\.]+)\)::[a-z]+"
 FILTERS_QUOTE_REGEX = r"'([\w\.]+)'::[a-z]+"
@@ -89,13 +90,9 @@ def get_query_components(plan, query):
     elif plan['Node Type'] == 'Sort':
         query_components = parse_sort(plan, query)
 
-    elif plan['Node Type'] == 'Seq Scan':
-        query_components = parse_seq_scan(plan, query)
+    elif plan['Node Type'] in ['Seq Scan', 'Index Scan', 'Index Only Scan', 'Bitmap Index Scan', 'Bitmap Heap Scan']:
+        query_components = parse_scan(plan, query)
 
-    # elif plan['Node Type'] in ['Index Only Scan', 'Bitmap Index Scan', 'Bitmap Heap Scan']:
-    #     query_components = parse_index_only_scan(plan, query)
-    # elif plan['Node Type'] == 'Index Scan':
-    #     query_components = parse_index_scan(plan, query)
     # elif plan['Node Type'] == 'Hash Join':
     #     query_components = parse_hash_join(plan, query)
     # elif plan['Node Type'] == 'Merge Join':
@@ -110,9 +107,6 @@ def get_query_components(plan, query):
     return [c.upper() for c in query_components]
 
 def parse_sort(plan, query):
-
-    if 'Sort Key' not in plan.keys():
-        return []
 
     sort_keys_regex = []
 
@@ -132,24 +126,23 @@ def parse_sort(plan, query):
 
     # join sort keys regex by comma
     sort_keys_joined = ",\s*".join(sort_keys_regex)
-    regex = QUERY_SORT_REGEX.format(sort_keys_joined)
 
-    search = re.search(regex, query, re.IGNORECASE)
-    return [search[0]] if search else []
+    regex = QUERY_SORT_REGEX.format(sort_keys_joined)
+    return [find_matching_query(regex, query)]
 
 def parse_limit(plan, query):
     regex = QUERY_LIMIT_REGEX.format(plan['Plan Rows'])
+    return [find_matching_query(regex, query)]
 
-    search = re.search(regex, query, re.IGNORECASE)
-    return [search[0]] if search else []
-
-def parse_seq_scan(plan, query):
+def parse_scan(plan, query):
     query_components = []
     if all(key in plan for key in ['Relation Name', 'Alias']):
         relation_regex = QUERY_SCAN_RELATION_REGEX.format(plan['Relation Name'], plan['Alias'])
-        relation_search = re.search(relation_regex, query, re.IGNORECASE)
-        query_components.append(relation_search[0])
+        from_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query))
+        relation_component = find_matching_query(relation_regex, from_clause.group(), from_clause.start())
+        query_components.append(relation_component)
 
+    where_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('WHERE'), query))
     conditions = []
     for key in ['Filter', 'Index Cond']:
         if key in plan:
@@ -158,10 +151,20 @@ def parse_seq_scan(plan, query):
 
     for condition in conditions:
         condition_regex = re.sub(r"\w+\.", r"(\\w+)?", condition)
-        search = re.search(condition_regex, query, re.IGNORECASE)
-        if search:
-            query_components.append(search[0])
+        condition_component = find_matching_query(condition_regex, where_clause.group(), where_clause.start())
+        if condition_component:
+            query_components.append(condition_component)
     return query_components
+
+def find_matching_query(regex, query, offset=0):
+    search = re.finditer(regex, query, re.IGNORECASE)
+    result = next(search, None)
+    if result is not None:
+        return {
+            'start': offset + result.start(),
+            'end': offset + result.end(),
+            'match': result.group()
+        }
 
 def extract_conditions(layers):
     conditions = []
