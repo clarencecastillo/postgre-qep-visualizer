@@ -1,11 +1,5 @@
-from utils import format
-from analysis import *
-import json
-
-def read_json(file_path):
-    with open(file_path, 'r') as f:
-        content = json.load(f)
-    return content
+from utils import format, read_json
+from analysis import analyze
 
 tests = read_json('tests.json')
 
@@ -13,7 +7,7 @@ print('Available Test Cases:')
 for i, test in enumerate(tests):
     print(str(i) + '. ' + test['Test Case'])
 
-test = tests[17]
+test = tests[0]
 test_case = test['Test Case']
 query = test['Query']
 execution_plan = test['Execution Plan']

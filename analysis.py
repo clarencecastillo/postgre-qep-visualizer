@@ -24,8 +24,8 @@ NODE_DESCRIPTIONS = {
 def analyze(execution_plan, query):
     formatted_query = format(query)
     analyze_plan(execution_plan['Plan'], formatted_query)
+    execution_plan['Longest Duration'] = get_longest_duration(execution_plan['Plan'])
     return execution_plan, formatted_query
-
 
 def get_node_description(plan):
 
@@ -46,6 +46,16 @@ def calculate_actual_duration(plan):
     # actual duration must be adjusted by number of loops
     actual_duration = actual_duration * plan['Actual Loops'];
     return actual_duration;
+
+def get_longest_duration(plan):
+    duration = plan['Actual Duration']
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            duration = max(duration, get_longest_duration(sub_plan))
+        return duration
+    return duration
+
 
 def analyze_plan(plan, query):
     plan['Query'] = get_query_components(plan, query)
@@ -131,3 +141,31 @@ def parse_seq_scan(plan, query):
         regex += "WHERE(.*\n)*(?<!\t)"
     search = re.search(regex, query, re.IGNORECASE)
     return [search[0]] if search else []
+
+
+
+from utils import format
+from analysis import *
+import json
+
+def read_json(file_path):
+    with open(file_path, 'r') as f:
+        content = json.load(f)
+    return content
+
+tests = read_json('tests.json')
+
+print('Available Test Cases:')
+for i, test in enumerate(tests):
+    print(str(i) + '. ' + test['Test Case'])
+
+test = tests[-2]
+test_case = test['Test Case']
+query = test['Query']
+execution_plan = test['Execution Plan']
+print('Test Case: \n' + test_case + '\n')
+print('Input Query: \n' + query + '\n')
+print('Formatted Query: \n' + format(query) + '\n')
+
+e,q = analyze(execution_plan, query)
+e['Longest Duration']
