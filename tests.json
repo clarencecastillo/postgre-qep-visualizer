@@ -1573,6 +1573,8 @@
     }
   },
 
+
+
   {
     "Query": "SELECT PUBLICATION.pubType, PUBLICATION.pubYear, COUNT(*) FROM PUBLICATION GROUP BY PUBLICATION.pubType, PUBLICATION.pubYear",
     "Test Case": "Aggregate",
@@ -2060,6 +2062,8 @@
       "Execution Time": 233.034
     }
   },
+
+
 
   {
     "Query": "SELECT PUBLICATION.pubYear, PUBLICATION.pubKey FROM PUBLICATION ORDER BY PUBLICATION.pubYear",
@@ -2589,6 +2593,582 @@
         "Execution Time": 315.672
       }
     },
+
+
+      {
+        "Query": "SELECT AUTHORSHIP.personKey, COUNT(*) FROM AUTHORSHIP GROUP BY AUTHORSHIP.personKey",
+        "Test Case": "Gather Merge",
+        "Execution Plan": {
+          "Plan": {
+            "Node Type": "Aggregate",
+            "Strategy": "Sorted",
+            "Partial Mode": "Finalize",
+            "Parallel Aware": false,
+            "Startup Cost": 194664.17,
+            "Total Cost": 263467.58,
+            "Plan Rows": 227633,
+            "Plan Width": 26,
+            "Actual Startup Time": 15730.175,
+            "Actual Total Time": 22795.913,
+            "Actual Rows": 1003787,
+            "Actual Loops": 1,
+            "Output": ["personkey", "count(*)"],
+            "Group Key": ["authorship.personkey"],
+            "Shared Hit Blocks": 228,
+            "Shared Read Blocks": 9036,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 5261,
+            "Temp Written Blocks": 5285,
+            "Expected Query": [{
+              "Index": 55,
+              "Query": "GROUP BY AUTHORSHIP.PERSONKEY"
+            }],
+            "Plans": [
+              {
+                "Node Type": "Gather Merge",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Startup Cost": 194664.17,
+                "Total Cost": 258914.92,
+                "Plan Rows": 455266,
+                "Plan Width": 26,
+                "Actual Startup Time": 15730.154,
+                "Actual Total Time": 22375.358,
+                "Actual Rows": 1009328,
+                "Actual Loops": 1,
+                "Output": ["personkey", "(PARTIAL count(*))"],
+                "Workers Planned": 2,
+                "Workers Launched": 2,
+                "Shared Hit Blocks": 1218,
+                "Shared Read Blocks": 26889,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 15886,
+                "Temp Written Blocks": 15959,
+                "Expected Query": [{
+                  "Index": 7,
+                  "Query": "AUTHORSHIP.PERSONKEY"
+                }, {
+                  "Index": 30,
+                  "Query": "COUNT(*)"
+                }],
+                "Plans": [
+                  {
+                    "Node Type": "Aggregate",
+                    "Strategy": "Sorted",
+                    "Partial Mode": "Partial",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Startup Cost": 193664.15,
+                    "Total Cost": 205365.91,
+                    "Plan Rows": 227633,
+                    "Plan Width": 26,
+                    "Actual Startup Time": 15667.056,
+                    "Actual Total Time": 19826.313,
+                    "Actual Rows": 336443,
+                    "Actual Loops": 3,
+                    "Output": ["personkey", "PARTIAL count(*)"],
+                    "Group Key": ["authorship.personkey"],
+                    "Shared Hit Blocks": 1218,
+                    "Shared Read Blocks": 26889,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 15886,
+                    "Temp Written Blocks": 15959,
+                    "Expected Query": [{
+                      "Index": 55,
+                      "Query": "GROUP BY AUTHORSHIP.PERSONKEY"
+                    }],
+                    "Workers": [
+                      {
+                        "Worker Number": 0,
+                        "Actual Startup Time": 15614.789,
+                        "Actual Total Time": 20076.539,
+                        "Actual Rows": 335072,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 419,
+                        "Shared Read Blocks": 9096,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 5347,
+                        "Temp Written Blocks": 5372
+                      },
+                      {
+                        "Worker Number": 1,
+                        "Actual Startup Time": 15724.203,
+                        "Actual Total Time": 20194.818,
+                        "Actual Rows": 336739,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 571,
+                        "Shared Read Blocks": 8757,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 5278,
+                        "Temp Written Blocks": 5302
+                      }
+                    ],
+                    "Plans": [
+                      {
+                        "Node Type": "Sort",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Startup Cost": 193664.15,
+                        "Total Cost": 196805.96,
+                        "Plan Rows": 1256724,
+                        "Plan Width": 18,
+                        "Actual Startup Time": 15667.029,
+                        "Actual Total Time": 19509.257,
+                        "Actual Rows": 1005379,
+                        "Actual Loops": 3,
+                        "Output": ["personkey"],
+                        "Sort Key": ["authorship.personkey"],
+                        "Sort Method": "external merge",
+                        "Sort Space Used": 28184,
+                        "Sort Space Type": "Disk",
+                        "Shared Hit Blocks": 1218,
+                        "Shared Read Blocks": 26889,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 15886,
+                        "Temp Written Blocks": 15959,
+                        "Expected Query": [{
+                          "Index": 55,
+                          "Query": "GROUP BY AUTHORSHIP.PERSONKEY"
+                        }],
+                        "Workers": [
+                          {
+                            "Worker Number": 0,
+                            "Actual Startup Time": 15614.753,
+                            "Actual Total Time": 19735.676,
+                            "Actual Rows": 1020166,
+                            "Actual Loops": 1,
+                            "Shared Hit Blocks": 419,
+                            "Shared Read Blocks": 9096,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Local Hit Blocks": 0,
+                            "Local Read Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Temp Read Blocks": 5347,
+                            "Temp Written Blocks": 5372
+                          },
+                          {
+                            "Worker Number": 1,
+                            "Actual Startup Time": 15724.178,
+                            "Actual Total Time": 19856.058,
+                            "Actual Rows": 998363,
+                            "Actual Loops": 1,
+                            "Shared Hit Blocks": 571,
+                            "Shared Read Blocks": 8757,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Local Hit Blocks": 0,
+                            "Local Read Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Temp Read Blocks": 5278,
+                            "Temp Written Blocks": 5302
+                          }
+                        ],
+                        "Plans": [
+                          {
+                            "Node Type": "Seq Scan",
+                            "Parent Relationship": "Outer",
+                            "Parallel Aware": true,
+                            "Relation Name": "authorship",
+                            "Schema": "public",
+                            "Alias": "authorship",
+                            "Startup Cost": 0.00,
+                            "Total Cost": 40576.24,
+                            "Plan Rows": 1256724,
+                            "Plan Width": 18,
+                            "Actual Startup Time": 0.052,
+                            "Actual Total Time": 212.405,
+                            "Actual Rows": 1005379,
+                            "Actual Loops": 3,
+                            "Output": ["personkey"],
+                            "Shared Hit Blocks": 1120,
+                            "Shared Read Blocks": 26889,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Local Hit Blocks": 0,
+                            "Local Read Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0,
+                            "Expected Query": [{
+                              "Index": 44,
+                              "Query": "AUTHORSHIP"
+                            }],
+                            "Workers": [
+                              {
+                                "Worker Number": 0,
+                                "Actual Startup Time": 0.078,
+                                "Actual Total Time": 204.246,
+                                "Actual Rows": 1020166,
+                                "Actual Loops": 1,
+                                "Shared Hit Blocks": 370,
+                                "Shared Read Blocks": 9096,
+                                "Shared Dirtied Blocks": 0,
+                                "Shared Written Blocks": 0,
+                                "Local Hit Blocks": 0,
+                                "Local Read Blocks": 0,
+                                "Local Dirtied Blocks": 0,
+                                "Local Written Blocks": 0,
+                                "Temp Read Blocks": 0,
+                                "Temp Written Blocks": 0
+                              },
+                              {
+                                "Worker Number": 1,
+                                "Actual Startup Time": 0.066,
+                                "Actual Total Time": 213.899,
+                                "Actual Rows": 998363,
+                                "Actual Loops": 1,
+                                "Shared Hit Blocks": 522,
+                                "Shared Read Blocks": 8757,
+                                "Shared Dirtied Blocks": 0,
+                                "Shared Written Blocks": 0,
+                                "Local Hit Blocks": 0,
+                                "Local Read Blocks": 0,
+                                "Local Dirtied Blocks": 0,
+                                "Local Written Blocks": 0,
+                                "Temp Read Blocks": 0,
+                                "Temp Written Blocks": 0
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning Time": 0.068,
+          "Triggers": [
+          ],
+          "Execution Time": 22876.889
+        }
+      },
+
+
+        {
+          "Query": "WITH cte AS (select pubYear, pubTitle from PUBLICATION  where pubYear = 2000) select * from cte;",
+          "Test Case": "CTE Scan",
+          "Execution Plan": {
+            "Plan": {
+              "Node Type": "CTE Scan",
+              "Parallel Aware": false,
+              "CTE Name": "cte",
+              "Alias": "cte",
+              "Startup Cost": 30325.15,
+              "Total Cost": 30679.89,
+              "Plan Rows": 17737,
+              "Plan Width": 518,
+              "Actual Startup Time": 0.173,
+              "Actual Total Time": 96.760,
+              "Actual Rows": 18829,
+              "Actual Loops": 1,
+              "Output": ["cte.pubyear", "cte.pubtitle"],
+              "Shared Hit Blocks": 1088,
+              "Shared Read Blocks": 18591,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Expected Query": [{
+                "Index": 103,
+                "Query": "CTE"
+              }],
+              "Plans": [
+                {
+                  "Node Type": "Gather",
+                  "Parent Relationship": "InitPlan",
+                  "Subplan Name": "CTE cte",
+                  "Parallel Aware": false,
+                  "Startup Cost": 1000.00,
+                  "Total Cost": 30325.15,
+                  "Plan Rows": 17737,
+                  "Plan Width": 77,
+                  "Actual Startup Time": 0.171,
+                  "Actual Total Time": 90.943,
+                  "Actual Rows": 18829,
+                  "Actual Loops": 1,
+                  "Output": ["publication.pubyear", "publication.pubtitle"],
+                  "Workers Planned": 1,
+                  "Workers Launched": 1,
+                  "Single Copy": false,
+                  "Shared Hit Blocks": 1088,
+                  "Shared Read Blocks": 18591,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "Expected Query": [{
+                    "Index": 22,
+                    "Query": "PUBYEAR"
+                  }, {
+                    "Index": 35,
+                    "Query": "PUBTITLE"
+                  }, {
+                    "Index": 52,
+                    "Query": "PUBLICATION"
+                  }],
+                  "Plans": [
+                    {
+                      "Node Type": "Seq Scan",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": true,
+                      "Relation Name": "publication",
+                      "Schema": "public",
+                      "Alias": "publication",
+                      "Startup Cost": 0.00,
+                      "Total Cost": 27551.45,
+                      "Plan Rows": 10434,
+                      "Plan Width": 77,
+                      "Actual Startup Time": 0.053,
+                      "Actual Total Time": 87.161,
+                      "Actual Rows": 9414,
+                      "Actual Loops": 2,
+                      "Output": ["publication.pubyear", "publication.pubtitle"],
+                      "Filter": "(publication.pubyear = 2000)",
+                      "Rows Removed by Filter": 525912,
+                      "Shared Hit Blocks": 1088,
+                      "Shared Read Blocks": 18591,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Expected Query": [{
+                        "Index": 22,
+                        "Query": "PUBYEAR"
+                      }, {
+                        "Index": 35,
+                        "Query": "PUBTITLE"
+                      }, {
+                        "Index": 52,
+                        "Query": "PUBLICATION"
+                      }, {
+                        "Index": 73,
+                        "Query": "PUBYEAR = 2000"
+                      }],
+                      "Workers": [
+                        {
+                          "Worker Number": 0,
+                          "Actual Startup Time": 0.060,
+                          "Actual Total Time": 89.213,
+                          "Actual Rows": 9753,
+                          "Actual Loops": 1,
+                          "Shared Hit Blocks": 400,
+                          "Shared Read Blocks": 9843,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "Planning Time": 0.064,
+            "Triggers": [
+            ],
+            "Execution Time": 99.212
+          }
+        },
+
+
+
+                {
+                  "Query": "WITH cte AS (select pubYear, pubTitle from PUBLICATION  where pubYear = 2000) select pubTitle from cte where pubTitle LIKE '%data%';",
+                  "Test Case": "CTE Scan (with filter)",
+                  "Execution Plan": {
+                    "Plan": {
+                      "Node Type": "CTE Scan",
+                      "Parallel Aware": false,
+                      "CTE Name": "cte",
+                      "Alias": "cte",
+                      "Startup Cost": 30325.15,
+                      "Total Cost": 30724.23,
+                      "Plan Rows": 142,
+                      "Plan Width": 516,
+                      "Actual Startup Time": 0.812,
+                      "Actual Total Time": 99.206,
+                      "Actual Rows": 378,
+                      "Actual Loops": 1,
+                      "Output": ["cte.pubtitle"],
+                      "Filter": "((cte.pubtitle)::text ~~ '%data%'::text)",
+                      "Rows Removed by Filter": 18451,
+                      "Shared Hit Blocks": 1216,
+                      "Shared Read Blocks": 18463,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "Expected Query": [{
+                        "Index": 110,
+                        "Query": "CTE"
+                      }, {
+                        "Index": 120,
+                        "Query": "PUBTITLE LIKE '%DATA%'"
+                      }],
+                      "Plans": [
+                        {
+                          "Node Type": "Gather",
+                          "Parent Relationship": "InitPlan",
+                          "Subplan Name": "CTE cte",
+                          "Parallel Aware": false,
+                          "Startup Cost": 1000.00,
+                          "Total Cost": 30325.15,
+                          "Plan Rows": 17737,
+                          "Plan Width": 77,
+                          "Actual Startup Time": 0.145,
+                          "Actual Total Time": 91.259,
+                          "Actual Rows": 18829,
+                          "Actual Loops": 1,
+                          "Output": ["publication.pubyear", "publication.pubtitle"],
+                          "Workers Planned": 1,
+                          "Workers Launched": 1,
+                          "Single Copy": false,
+                          "Shared Hit Blocks": 1216,
+                          "Shared Read Blocks": 18463,
+                          "Shared Dirtied Blocks": 0,
+                          "Shared Written Blocks": 0,
+                          "Local Hit Blocks": 0,
+                          "Local Read Blocks": 0,
+                          "Local Dirtied Blocks": 0,
+                          "Local Written Blocks": 0,
+                          "Temp Read Blocks": 0,
+                          "Temp Written Blocks": 0,
+                          "Expected Query": [{
+                            "Index": 22,
+                            "Query": "PUBYEAR"
+                          }, {
+                            "Index": 35,
+                            "Query": "PUBTITLE"
+                          }],
+                          "Plans": [
+                            {
+                              "Node Type": "Seq Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": true,
+                              "Relation Name": "publication",
+                              "Schema": "public",
+                              "Alias": "publication",
+                              "Startup Cost": 0.00,
+                              "Total Cost": 27551.45,
+                              "Plan Rows": 10434,
+                              "Plan Width": 77,
+                              "Actual Startup Time": 0.077,
+                              "Actual Total Time": 88.268,
+                              "Actual Rows": 9414,
+                              "Actual Loops": 2,
+                              "Output": ["publication.pubyear", "publication.pubtitle"],
+                              "Filter": "(publication.pubyear = 2000)",
+                              "Rows Removed by Filter": 525912,
+                              "Shared Hit Blocks": 1216,
+                              "Shared Read Blocks": 18463,
+                              "Shared Dirtied Blocks": 0,
+                              "Shared Written Blocks": 0,
+                              "Local Hit Blocks": 0,
+                              "Local Read Blocks": 0,
+                              "Local Dirtied Blocks": 0,
+                              "Local Written Blocks": 0,
+                              "Temp Read Blocks": 0,
+                              "Temp Written Blocks": 0,
+                              "Expected Query": [{
+                                "Index": 22,
+                                "Query": "PUBYEAR"
+                              }, {
+                                "Index": 35,
+                                "Query": "PUBTITLE"
+                              }, {
+                                "Index": 52,
+                                "Query": "PUBLICATION"
+                              }, {
+                                "Index": 73,
+                                "Query": "PUBYEAR = 2000"
+                              }],
+                              "Workers": [
+                                {
+                                  "Worker Number": 0,
+                                  "Actual Startup Time": 0.113,
+                                  "Actual Total Time": 90.905,
+                                  "Actual Rows": 9373,
+                                  "Actual Loops": 1,
+                                  "Shared Hit Blocks": 449,
+                                  "Shared Read Blocks": 9391,
+                                  "Shared Dirtied Blocks": 0,
+                                  "Shared Written Blocks": 0,
+                                  "Local Hit Blocks": 0,
+                                  "Local Read Blocks": 0,
+                                  "Local Dirtied Blocks": 0,
+                                  "Local Written Blocks": 0,
+                                  "Temp Read Blocks": 0,
+                                  "Temp Written Blocks": 0
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "Planning Time": 0.059,
+                    "Triggers": [
+                    ],
+                    "Execution Time": 100.420
+                  }
+                },
 
   {
     "Query": "SELECT DISTINCT PUBLICATION.pubKey FROM PUBLICATION",
