@@ -8,7 +8,7 @@ print('Available Test Cases:')
 for i, test in enumerate(tests):
     print(str(i) + '. ' + test['Test Case'])
 
-test = tests[20]
+test = tests[22]
 test_case = test['Test Case']
 query = test['Query']
 execution_plan = test['Execution Plan']
@@ -17,18 +17,7 @@ print('Input Query: \n' + query + '\n')
 print('Formatted Query: \n' + format(query) + '\n')
 
 format(query)
-'SELECT DISTINCT PUBLICATION.PUBKEY\nFROM PUBLICATION'
-list(re.finditer("PUBLICATION", format(query)))
+"WITH CTE AS\n\t\t(SELECT PUBYEAR,\n\t\t\t\tPUBTITLE\n\t\t\tFROM PUBLICATION\n\t\t\tWHERE PUBYEAR = 2000)\nSELECT PUBTITLE\nFROM CTE\nWHERE PUBTITLE LIKE '%DATA%';"
+list(re.finditer("PUBYEAR = 2000", format(query)))
 
 analyze(execution_plan, query)
-
-# "Test Case": "Gather Merge, Index Join",
-  #
-  # {
-  #   "Query": "",
-  #   "Test Case": "",
-  #   "Execution Plan": {
-  #
-  #   }
-  # },
-#
