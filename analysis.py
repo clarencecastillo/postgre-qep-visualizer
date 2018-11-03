@@ -29,8 +29,15 @@ NODE_DESCRIPTIONS = {
 def analyze(execution_plan, query):
     formatted_query = format(query)
     analyze_plan(execution_plan['Plan'], formatted_query)
+
     execution_plan['Longest Duration'] = get_longest_duration(execution_plan['Plan'])
     find_slowest_node(execution_plan['Plan'], execution_plan['Longest Duration'])
+
+    execution_plan['Highest Cost'] = get_longest_duration(execution_plan['Plan'])
+    find_costliest_node(execution_plan['Plan'], execution_plan['Highest Cost'])
+
+    execution_plan['Greatest Errors'] = get_greatest_errors(execution_plan['Plan'])
+    find_greatest_errors_node(execution_plan['Plan'], execution_plan['Greatest Errors'])
     return execution_plan, formatted_query
 
 def get_node_description(plan):
@@ -45,12 +52,15 @@ def calculate_actual_duration(plan):
     actual_duration = plan['Actual Total Time']
     if 'Plans' in plan.keys():
         for sub_plan in plan['Plans']:
+            # since CTE scan duration is already included in its subnodes,
+            # it should be be subtracted from the duration of this node
             if (sub_plan['Node Type'] != 'CTE_Scan'):
                 actual_duration -= sub_plan['Actual Total Time'];
 
     # time is reported for an invidual loop
     # actual duration must be adjusted by number of loops
     actual_duration = actual_duration * plan['Actual Loops'];
+    print(actual_duration)
     return actual_duration;
 
 def get_longest_duration(plan):
@@ -71,10 +81,67 @@ def find_slowest_node(plan, longest_duration):
         for sub_plan in plan['Plans']:
             find_slowest_node(sub_plan, longest_duration)
 
+def calculate_actual_cost(plan):
+    actual_cost = plan['Total Cost']
+    if 'Plans' in plan.keys():
+        for sub_plan in plan['Plans']:
+            # since CTE scan duration is already included in its subnodes,
+            # it should be be subtracted from the duration of this node
+            if (sub_plan['Node Type'] != 'CTE_Scan'):
+                actual_cost -= sub_plan['Total Cost'];
+
+    # time is reported for an invidual loop
+    # actual duration must be adjusted by number of loops
+    actual_cost = actual_cost * plan['Actual Loops'];
+    print(actual_cost)
+    return actual_cost;
+
+def get_highest_cost(plan):
+    cost = plan['Actual Cost']
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            cost = max(cost, get_highest_cost(sub_plan))
+        return cost
+    return cost
+
+def find_costliest_node(plan, highest_cost):
+    plan['Is Costliest'] = False
+    if plan['Actual Cost'] == highest_cost:
+        plan['Is Costliest'] = True
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            find_costliest_node(sub_plan, highest_cost)
+
+def calculate_estimate_errors(plan):
+    return abs(plan['Actual Rows'] - plan['Plan Rows'])
+
+def get_greatest_errors(plan):
+    error = plan['Estimate Errors']
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            error = max(error, get_greatest_error(sub_plan))
+        return error
+    return error
+
+def find_greatest_errors_node(plan, greatest_errors):
+    plan['Has Greatest Errors'] = False
+    if plan['Estimate Errors'] == greatest_errors:
+        plan['Has Greatest Errors'] = True
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            find_greatest_errors_node(sub_plan, greatest_errors)
+
+
 def analyze_plan(plan, query):
-    plan['Query'] = get_query_components(plan, query)
+    # plan['Query'] = get_query_components(plan, query)
     plan['Actual Duration'] = calculate_actual_duration(plan)
+    plan['Actual Cost'] = calculate_actual_cost(plan)
     plan['Description'] = get_node_description(plan)
+    plan['Estimate Errors'] = calculate_estimate_errors(plan)
 
     if 'Plans' in plan.keys():
         for sub_plan in plan['Plans']:
@@ -138,6 +205,7 @@ def parse_scan(plan, query):
     query_components = []
     if all(key in plan for key in ['Relation Name', 'Alias']):
         relation_regex = QUERY_SCAN_RELATION_REGEX.format(plan['Relation Name'], plan['Alias'])
+        re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query)
         from_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query))
         relation_component = find_matching_query(relation_regex, from_clause.group(), from_clause.start())
         query_components.append(relation_component)
@@ -179,3 +247,13 @@ def parse_filters(filters):
     filters = re.sub(FILTERS_PAREN_REGEX, "\g<1>", filters)
     filters = re.sub(FILTERS_QUOTE_REGEX, "'\g<1>'",filters)
     return extract_conditions(parse_nested(filters))
+
+
+tests = read_json('tests.json')
+print('Available Test Cases:')
+for i, test in enumerate(tests):
+    print(str(i) + '. ' + test['Test Case'])
+
+test = tests[-2]
+execution_plan = test['Execution Plan']
+analyze(execution_plan, query)
