@@ -38,6 +38,10 @@ def analyze(execution_plan, query):
 
     execution_plan['Greatest Errors'] = get_greatest_errors(execution_plan['Plan'])
     find_greatest_errors_node(execution_plan['Plan'], execution_plan['Greatest Errors'])
+
+    execution_plan['Largest Size'] = get_largest_nodes(execution_plan['Plan'])
+    find_largest_node(execution_plan['Plan'], execution_plan['Largest Size'])
+
     return execution_plan, formatted_query
 
 def get_node_description(plan):
@@ -135,13 +139,31 @@ def find_greatest_errors_node(plan, greatest_errors):
         for sub_plan in plan['Plans']:
             find_greatest_errors_node(sub_plan, greatest_errors)
 
+def get_largest_nodes(plan):
+    size = plan['Actual Rows']
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            size = max(size, get_largest_nodes(sub_plan))
+        return size
+    return size
+
+def find_largest_node(plan, largest_size):
+    plan['Is Largest'] = False
+    if plan['Actual Rows'] == largest_size:
+        plan['Is Largest'] = True
+
+    if 'Plans' in plan:
+        for sub_plan in plan['Plans']:
+            find_largest_node(sub_plan, largest_size)
+
 
 def analyze_plan(plan, query):
     # plan['Query'] = get_query_components(plan, query)
     plan['Actual Duration'] = calculate_actual_duration(plan)
     plan['Actual Cost'] = calculate_actual_cost(plan)
-    plan['Description'] = get_node_description(plan)
     plan['Estimate Errors'] = calculate_estimate_errors(plan)
+    plan['Description'] = get_node_description(plan)
 
     if 'Plans' in plan.keys():
         for sub_plan in plan['Plans']:
@@ -151,23 +173,46 @@ def get_query_components(plan, query):
 
     query_components = []
 
+    # Limit: Keyword Limit with number
     if plan['Node Type'] == 'Limit':
         query_components = parse_limit(plan, query)
 
+    # Sort: Sort key, Or Inherits the query from its parent (If the node of ’Sort’ is a child of another node with strategy ‘sorter’)
     elif plan['Node Type'] == 'Sort':
         query_components = parse_sort(plan, query)
 
-    elif plan['Node Type'] in ['Seq Scan', 'Index Scan', 'Index Only Scan', 'Bitmap Index Scan', 'Bitmap Heap Scan']:
+    # Scan: scanned table, filter condition, index condition, recheck condition (deal with '::text', 'LIKE' --> '~~')
+    elif plan['Node Type'] in ['Seq Scan', 'Index Scan', 'Index Only Scan', 'Bitmap Index Scan', 'Bitmap Heap Scan', 'CTE Scan']:
         query_components = parse_scan(plan, query)
 
+    # Hash Join: join condition (might reverse order)
     # elif plan['Node Type'] == 'Hash Join':
     #     query_components = parse_hash_join(plan, query)
+
+    # Merge Join: join condition (might reverse order)
     # elif plan['Node Type'] == 'Merge Join':
     #     query_components = parse_merge_join(plan, query)
-    # elif plan['Node Type'] == 'Aggregate':
+
+    # Nested Loop: query components from its child nodes
+    # elif plan['Node Type'] == 'Nested Loop':
+    #     query_components = parse_merge_join(plan, query)
+
+    # Gathers: gathered columns
+    # elif plan['Node Type'] in ['Gather', 'Gather Merge']:
+    #     query_components = parse_gather(plan, query)
+
+    # Aggregates: Group Key
+    # elif plan['Node Type'] in ['Aggregate', 'GroupAggregate', 'HashAggregate']:
     #     query_components = parse_aggregate(plan, query)
+
+    # Hash: Hashed table (take from child nodes)
+    # elif plan['Node Type'] == 'Hash':
+    #     query_components = parse_hash(plan, query)
+
+    # Unique: Keyword DISTINCT with column(s)
     # elif plan['Node Type'] == 'Unique':
     #     query_components = parse_unique(plan, query)
+
     # else:
     #     query_components = parse_general(plan, query)
 
@@ -256,4 +301,5 @@ for i, test in enumerate(tests):
 
 test = tests[-2]
 execution_plan = test['Execution Plan']
+execution_plan
 analyze(execution_plan, query)
