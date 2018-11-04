@@ -130,7 +130,7 @@ def get_greatest_errors(plan):
 
 def find_greatest_errors_node(plan, greatest_errors):
     plan['Has Greatest Errors'] = False
-    if plan['Estimate Errors'] == greatest_errors:
+    if greatest_errors > 0 and plan['Estimate Errors'] == greatest_errors:
         plan['Has Greatest Errors'] = True
 
     if 'Plans' in plan:
