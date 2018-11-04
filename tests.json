@@ -1,4 +1,5 @@
-[{
+[
+  {
     "Query": "SELECT PUBLICATION.pubTitle FROM PUBLICATION WHERE PUBLICATION.pubYear >= 2000 AND PUBLICATION.pubYear <= 2017",
     "Test Case": "Seq Scan (two conditions connected with AND, with table name)",
     "Execution Plan": {
@@ -30,14 +31,17 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 33,
-          "Query": "PUBLICATION"
+          "start": 33,
+          "end": 44,
+          "match": "PUBLICATION"
         }, {
-          "Index": 51,
-          "Query": "PUBLICATION.PUBYEAR >= 2000"
+          "start": 51,
+          "end": 78,
+          "match": "PUBLICATION.PUBYEAR >= 2000"
         }, {
-          "Index": 85,
-          "Query": "PUBLICATION.PUBYEAR <= 2017"
+          "start": 85,
+          "end": 112,
+          "match": "PUBLICATION.PUBYEAR <= 2017"
         }]
       },
       "Planning Time": 2.674,
@@ -78,11 +82,13 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 30,
-          "Query": "PUBLICATION"
+          "start": 30,
+          "end": 41,
+          "match": "PUBLICATION"
         }, {
-          "Index": 48,
-          "Query": "PUBTITLE >= PUBKEY"
+          "start": 48,
+          "end": 66,
+          "match": "PUBTITLE >= PUBKEY"
         }]
       },
       "Planning Time": 0.045,
@@ -123,11 +129,13 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 34,
-          "Query": "PUBLICATION"
+          "start": 34,
+          "end": 45,
+          "match": "PUBLICATION"
         }, {
-          "Index": 57,
-          "Query": "P.PUBTITLE >= P.PUBKEY"
+          "start": 57,
+          "end": 79,
+          "match": "P.PUBTITLE >= P.PUBKEY"
         }]
       },
       "Planning Time": 0.080,
@@ -169,17 +177,21 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 33,
-          "Query": "PUBLICATION"
+          "start": 33,
+          "end": 44,
+          "match": "PUBLICATION"
         }, {
-          "Index": 51,
-          "Query": "PUBLICATION.PUBYEAR >= 2000"
+          "start": 51,
+          "end": 78,
+          "match": "PUBLICATION.PUBYEAR >= 2000"
         }, {
-          "Index": 86,
-          "Query": "PUBLICATION.PUBTYPE = 'BOOK'"
+          "start": 86,
+          "end": 114,
+          "match": "PUBLICATION.PUBTYPE = 'BOOK'"
         }, {
-          "Index": 125,
-          "Query": "PUBLICATION.PUBTYPE = 'ARTICLE'"
+          "start": 125,
+          "end": 156,
+          "match": "PUBLICATION.PUBTYPE = 'ARTICLE'"
         }]
       },
       "Planning Time": 0.047,
@@ -218,10 +230,18 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 7,
-          "Query": "PUBLICATION.PUBKEY,\n\tPUBLICATION.PUBTITLE"
+          "start": 54,
+          "end": 65,
+          "match": "PUBLICATION"
+        }, {
+          "start": 72,
+          "end": 99,
+          "match": "PUBLICATION.PUBYEAR >= 2000"
+        }, {
+          "start": 106,
+          "end": 140,
+          "match": "PUBLICATION.PUBTITLE LIKE '%DATA%'"
         }],
-
         "Plans": [{
           "Node Type": "Seq Scan",
           "Parent Relationship": "Outer",
@@ -251,14 +271,17 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 54,
-            "Query": "PUBLICATION"
+            "start": 54,
+            "end": 65,
+            "match": "PUBLICATION"
           }, {
-            "Index": 72,
-            "Query": "PUBLICATION.PUBYEAR >= 2000"
+            "start": 72,
+            "end": 99,
+            "match": "PUBLICATION.PUBYEAR >= 2000"
           }, {
-            "Index": 106,
-            "Query": "PUBLICATION.PUBTITLE LIKE '%DATA%'"
+            "start": 106,
+            "end": 140,
+            "match": "PUBLICATION.PUBTITLE LIKE '%DATA%'"
           }],
           "Workers": [{
               "Worker Number": 0,
@@ -306,7 +329,7 @@
   {
     "Query": "SELECT * FROM PUBMONTH WHERE PUBMONTH.pubKey = 'books/aw/AhoHU83'",
     "Test Case": "Index Only Scan (text)",
-    "Execution Plan": [{
+    "Execution Plan": {
       "Plan": {
         "Node Type": "Index Only Scan",
         "Parallel Aware": false,
@@ -338,18 +361,20 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 14,
-          "Query": "PUBMONTH"
+          "start": 14,
+          "end": 22,
+          "match": "PUBMONTH"
         }, {
-          "Index": 29,
-          "Query": "PUBMONTH.PUBKEY = 'BOOKS/AW/AHOHU83'"
+          "start": 29,
+          "end": 65,
+          "match": "PUBMONTH.PUBKEY = 'BOOKS/AW/AHOHU83'"
         }]
 
       },
       "Planning Time": 0.065,
       "Triggers": [],
       "Execution Time": 0.042
-    }]
+    }
   },
 
   {
@@ -387,11 +412,13 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 17,
-          "Query": "PUBLISHER"
+          "start": 34,
+          "end": 43,
+          "match": "PUBLISHER"
         }, {
-          "Index": 50,
-          "Query": "PUBLISHER.PUBLISHERID < 10"
+          "start": 50,
+          "end": 76,
+          "match": "PUBLISHER.PUBLISHERID < 10"
         }]
 
       },
@@ -437,14 +464,17 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 33,
-          "Query": "PUBLICATION"
+          "start": 33,
+          "end": 44,
+          "match": "PUBLICATION"
         }, {
-          "Index": 51,
-          "Query": "PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"
+          "start": 51,
+          "end": 90,
+          "match": "PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"
         }, {
-          "Index": 97,
-          "Query": "PUBLICATION.PUBYEAR <= 2017"
+          "start": 97,
+          "end": 124,
+          "match": "PUBLICATION.PUBYEAR <= 2017"
         }]
 
       },
@@ -488,14 +518,17 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 14,
-          "Query": "PUBLICATION"
+          "start": 14,
+          "end": 25,
+          "match": "PUBLICATION"
         }, {
-          "Index": 32,
-          "Query": "PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"
+          "start": 32,
+          "end": 71,
+          "match": "PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"
         }, {
-          "Index": 77,
-          "Query": "PUBLICATION.PUBKEY = 'BOOKS/AW/ARNOLDG99'"
+          "start": 77,
+          "end": 118,
+          "match": "PUBLICATION.PUBKEY = 'BOOKS/AW/ARNOLDG99'"
         }],
         "Plans": [{
           "Node Type": "BitmapOr",
@@ -520,8 +553,13 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 74,
-            "Query": "OR"
+            "start": 32,
+            "end": 71,
+            "match": "PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"
+          }, {
+            "start": 77,
+            "end": 118,
+            "match": "PUBLICATION.PUBKEY = 'BOOKS/AW/ARNOLDG99'"
           }],
           "Plans": [{
               "Node Type": "Bitmap Index Scan",
@@ -548,11 +586,9 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 14,
-                "Query": "PUBLICATION"
-              }, {
-                "Index": 32,
-                "Query": "PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"
+                "start": 32,
+                "end": 71,
+                "match": "PUBLICATION.PUBKEY = 'BOOKS/AW/AHOHU83'"
               }]
             },
             {
@@ -580,11 +616,9 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 14,
-                "Query": "PUBLICATION"
-              }, {
-                "Index": 77,
-                "Query": "PUBLICATION.PUBKEY = 'BOOKS/AW/ARNOLDG99'"
+                "start": 77,
+                "end": 118,
+                "match": "PUBLICATION.PUBKEY = 'BOOKS/AW/ARNOLDG99'"
               }]
 
             }
@@ -627,8 +661,9 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 102,
-          "Query": "PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"
+          "start": 102,
+          "end": 148,
+          "match": "PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"
         }],
         "Plans": [{
             "Node Type": "Seq Scan",
@@ -657,8 +692,9 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 70,
-              "Query": "INPROCEEDING"
+              "start": 70,
+              "end": 82,
+              "match": "INPROCEEDING"
             }]
           },
           {
@@ -690,8 +726,9 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 85,
-              "Query": "PROCEEDING"
+              "start": 85,
+              "end": 95,
+              "match": "PROCEEDING"
             }],
             "Plans": [{
               "Node Type": "Seq Scan",
@@ -720,8 +757,9 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 85,
-                "Query": "PROCEEDING"
+                "start": 85,
+                "end": 95,
+                "match": "PROCEEDING"
               }]
             }]
           }
@@ -2843,284 +2881,6 @@
       "Execution Time": 22876.889
     }
   },
-
-
-  {
-    "Query": "WITH cte AS (select pubYear, pubTitle from PUBLICATION  where pubYear = 2000) select * from cte;",
-    "Test Case": "CTE Scan",
-    "Execution Plan": {
-      "Plan": {
-        "Node Type": "CTE Scan",
-        "Parallel Aware": false,
-        "CTE Name": "cte",
-        "Alias": "cte",
-        "Startup Cost": 30325.15,
-        "Total Cost": 30679.89,
-        "Plan Rows": 17737,
-        "Plan Width": 518,
-        "Actual Startup Time": 0.173,
-        "Actual Total Time": 96.760,
-        "Actual Rows": 18829,
-        "Actual Loops": 1,
-        "Output": ["cte.pubyear", "cte.pubtitle"],
-        "Shared Hit Blocks": 1088,
-        "Shared Read Blocks": 18591,
-        "Shared Dirtied Blocks": 0,
-        "Shared Written Blocks": 0,
-        "Local Hit Blocks": 0,
-        "Local Read Blocks": 0,
-        "Local Dirtied Blocks": 0,
-        "Local Written Blocks": 0,
-        "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0,
-        "Expected Query": [{
-          "Index": 103,
-          "Query": "CTE"
-        }],
-        "Plans": [{
-          "Node Type": "Gather",
-          "Parent Relationship": "InitPlan",
-          "Subplan Name": "CTE cte",
-          "Parallel Aware": false,
-          "Startup Cost": 1000.00,
-          "Total Cost": 30325.15,
-          "Plan Rows": 17737,
-          "Plan Width": 77,
-          "Actual Startup Time": 0.171,
-          "Actual Total Time": 90.943,
-          "Actual Rows": 18829,
-          "Actual Loops": 1,
-          "Output": ["publication.pubyear", "publication.pubtitle"],
-          "Workers Planned": 1,
-          "Workers Launched": 1,
-          "Single Copy": false,
-          "Shared Hit Blocks": 1088,
-          "Shared Read Blocks": 18591,
-          "Shared Dirtied Blocks": 0,
-          "Shared Written Blocks": 0,
-          "Local Hit Blocks": 0,
-          "Local Read Blocks": 0,
-          "Local Dirtied Blocks": 0,
-          "Local Written Blocks": 0,
-          "Temp Read Blocks": 0,
-          "Temp Written Blocks": 0,
-          "Expected Query": [{
-            "Index": 22,
-            "Query": "PUBYEAR"
-          }, {
-            "Index": 35,
-            "Query": "PUBTITLE"
-          }, {
-            "Index": 52,
-            "Query": "PUBLICATION"
-          }],
-          "Plans": [{
-            "Node Type": "Seq Scan",
-            "Parent Relationship": "Outer",
-            "Parallel Aware": true,
-            "Relation Name": "publication",
-            "Schema": "public",
-            "Alias": "publication",
-            "Startup Cost": 0.00,
-            "Total Cost": 27551.45,
-            "Plan Rows": 10434,
-            "Plan Width": 77,
-            "Actual Startup Time": 0.053,
-            "Actual Total Time": 87.161,
-            "Actual Rows": 9414,
-            "Actual Loops": 2,
-            "Output": ["publication.pubyear", "publication.pubtitle"],
-            "Filter": "(publication.pubyear = 2000)",
-            "Rows Removed by Filter": 525912,
-            "Shared Hit Blocks": 1088,
-            "Shared Read Blocks": 18591,
-            "Shared Dirtied Blocks": 0,
-            "Shared Written Blocks": 0,
-            "Local Hit Blocks": 0,
-            "Local Read Blocks": 0,
-            "Local Dirtied Blocks": 0,
-            "Local Written Blocks": 0,
-            "Temp Read Blocks": 0,
-            "Temp Written Blocks": 0,
-            "Expected Query": [{
-              "Index": 22,
-              "Query": "PUBYEAR"
-            }, {
-              "Index": 35,
-              "Query": "PUBTITLE"
-            }, {
-              "Index": 52,
-              "Query": "PUBLICATION"
-            }, {
-              "Index": 73,
-              "Query": "PUBYEAR = 2000"
-            }],
-            "Workers": [{
-              "Worker Number": 0,
-              "Actual Startup Time": 0.060,
-              "Actual Total Time": 89.213,
-              "Actual Rows": 9753,
-              "Actual Loops": 1,
-              "Shared Hit Blocks": 400,
-              "Shared Read Blocks": 9843,
-              "Shared Dirtied Blocks": 0,
-              "Shared Written Blocks": 0,
-              "Local Hit Blocks": 0,
-              "Local Read Blocks": 0,
-              "Local Dirtied Blocks": 0,
-              "Local Written Blocks": 0,
-              "Temp Read Blocks": 0,
-              "Temp Written Blocks": 0
-            }]
-          }]
-        }]
-      },
-      "Planning Time": 0.064,
-      "Triggers": [],
-      "Execution Time": 99.212
-    }
-  },
-
-
-
-  {
-    "Query": "WITH cte AS (select pubYear, pubTitle from PUBLICATION  where pubYear = 2000) select pubTitle from cte where pubTitle LIKE '%data%';",
-    "Test Case": "CTE Scan (with filter)",
-    "Execution Plan": {
-      "Plan": {
-        "Node Type": "CTE Scan",
-        "Parallel Aware": false,
-        "CTE Name": "cte",
-        "Alias": "cte",
-        "Startup Cost": 30325.15,
-        "Total Cost": 30724.23,
-        "Plan Rows": 142,
-        "Plan Width": 516,
-        "Actual Startup Time": 0.812,
-        "Actual Total Time": 99.206,
-        "Actual Rows": 378,
-        "Actual Loops": 1,
-        "Output": ["cte.pubtitle"],
-        "Filter": "((cte.pubtitle)::text ~~ '%data%'::text)",
-        "Rows Removed by Filter": 18451,
-        "Shared Hit Blocks": 1216,
-        "Shared Read Blocks": 18463,
-        "Shared Dirtied Blocks": 0,
-        "Shared Written Blocks": 0,
-        "Local Hit Blocks": 0,
-        "Local Read Blocks": 0,
-        "Local Dirtied Blocks": 0,
-        "Local Written Blocks": 0,
-        "Temp Read Blocks": 0,
-        "Temp Written Blocks": 0,
-        "Expected Query": [{
-          "Index": 110,
-          "Query": "CTE"
-        }, {
-          "Index": 120,
-          "Query": "PUBTITLE LIKE '%DATA%'"
-        }],
-        "Plans": [{
-          "Node Type": "Gather",
-          "Parent Relationship": "InitPlan",
-          "Subplan Name": "CTE cte",
-          "Parallel Aware": false,
-          "Startup Cost": 1000.00,
-          "Total Cost": 30325.15,
-          "Plan Rows": 17737,
-          "Plan Width": 77,
-          "Actual Startup Time": 0.145,
-          "Actual Total Time": 91.259,
-          "Actual Rows": 18829,
-          "Actual Loops": 1,
-          "Output": ["publication.pubyear", "publication.pubtitle"],
-          "Workers Planned": 1,
-          "Workers Launched": 1,
-          "Single Copy": false,
-          "Shared Hit Blocks": 1216,
-          "Shared Read Blocks": 18463,
-          "Shared Dirtied Blocks": 0,
-          "Shared Written Blocks": 0,
-          "Local Hit Blocks": 0,
-          "Local Read Blocks": 0,
-          "Local Dirtied Blocks": 0,
-          "Local Written Blocks": 0,
-          "Temp Read Blocks": 0,
-          "Temp Written Blocks": 0,
-          "Expected Query": [{
-            "Index": 22,
-            "Query": "PUBYEAR"
-          }, {
-            "Index": 35,
-            "Query": "PUBTITLE"
-          }],
-          "Plans": [{
-            "Node Type": "Seq Scan",
-            "Parent Relationship": "Outer",
-            "Parallel Aware": true,
-            "Relation Name": "publication",
-            "Schema": "public",
-            "Alias": "publication",
-            "Startup Cost": 0.00,
-            "Total Cost": 27551.45,
-            "Plan Rows": 10434,
-            "Plan Width": 77,
-            "Actual Startup Time": 0.077,
-            "Actual Total Time": 88.268,
-            "Actual Rows": 9414,
-            "Actual Loops": 2,
-            "Output": ["publication.pubyear", "publication.pubtitle"],
-            "Filter": "(publication.pubyear = 2000)",
-            "Rows Removed by Filter": 525912,
-            "Shared Hit Blocks": 1216,
-            "Shared Read Blocks": 18463,
-            "Shared Dirtied Blocks": 0,
-            "Shared Written Blocks": 0,
-            "Local Hit Blocks": 0,
-            "Local Read Blocks": 0,
-            "Local Dirtied Blocks": 0,
-            "Local Written Blocks": 0,
-            "Temp Read Blocks": 0,
-            "Temp Written Blocks": 0,
-            "Expected Query": [{
-              "Index": 22,
-              "Query": "PUBYEAR"
-            }, {
-              "Index": 35,
-              "Query": "PUBTITLE"
-            }, {
-              "Index": 52,
-              "Query": "PUBLICATION"
-            }, {
-              "Index": 73,
-              "Query": "PUBYEAR = 2000"
-            }],
-            "Workers": [{
-              "Worker Number": 0,
-              "Actual Startup Time": 0.113,
-              "Actual Total Time": 90.905,
-              "Actual Rows": 9373,
-              "Actual Loops": 1,
-              "Shared Hit Blocks": 449,
-              "Shared Read Blocks": 9391,
-              "Shared Dirtied Blocks": 0,
-              "Shared Written Blocks": 0,
-              "Local Hit Blocks": 0,
-              "Local Read Blocks": 0,
-              "Local Dirtied Blocks": 0,
-              "Local Written Blocks": 0,
-              "Temp Read Blocks": 0,
-              "Temp Written Blocks": 0
-            }]
-          }]
-        }]
-      },
-      "Planning Time": 0.059,
-      "Triggers": [],
-      "Execution Time": 100.420
-    }
-  },
-
   {
     "Query": "SELECT DISTINCT PUBLICATION.pubKey FROM PUBLICATION",
     "Test Case": "Unique",
@@ -3189,12 +2949,6 @@
       "Planning Time": 0.054,
       "Triggers": [],
       "Execution Time": 1743.362
-    }
-  },
-
-  { "Query": "",
-    "Test Case": "",
-    "Execution Plan":{
     }
   }
 ]
