@@ -1,6 +1,6 @@
 <div class="container-fluid pt-5 pl-5 pr-5">
   <h4 class="text-light mb-4">Visualization</h4>
-  <div class="d-flex w-100">
+  <div class="d-flex">
     <app-visualizer class="w-75" [plan]="augmentedPlan" [query]="formattedQuery"></app-visualizer>
     <div class="sidebar w-25 pl-5">
       <app-inspector *ngIf="selectedPlan" [plan]="selectedPlan" [query]="formattedQuery"></app-inspector>

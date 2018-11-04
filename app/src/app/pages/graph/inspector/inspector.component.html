@@ -52,7 +52,7 @@
   </div>
   <small class="text-secondary p-1 pt-2 pb-3">*Calculated attributes</small>
   <small class="query">
-    <pre class="text-light" innerHTML="{{query | highlight : plan['Query']}}" *ngIf="plan['Query'] != ''"></pre>
-    <pre class="text-light" *ngIf="plan['Query'] == ''">{{query}}</pre>
+    <pre class="text-light" innerHTML="{{query | highlight : plan['Query']}}" *ngIf="plan['Query'] != []"></pre>
+    <pre class="text-light" *ngIf="plan['Query'] == []">{{query}}</pre>
   </small>
 </div>

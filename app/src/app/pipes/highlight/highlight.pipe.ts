@@ -5,11 +5,24 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class HighlightPipe implements PipeTransform {
 
-  transform(value: any, args: any): any {
-    //  'gi' for case insensitive and can use 'g' if you want the search to be case sensitive.
-    const sanitised = args[0].replace('(', '\\(').replace(')', '\\)');
-    const re = new RegExp(sanitised, 'gi');
-    return value.replace(re, `<mark>${args[0]}</mark>`);
+  transform(query: string, components: QueryComponent[]): any {
+
+    components.sort((component1, component2) => component2.start - component1.start);
+
+    components.forEach(component => {
+      const pre_text = query.slice(0, component.start);
+      const match = query.slice(component.start, component.end);
+      const post_text = query.slice(component.end);
+      query = `${pre_text}<mark>${match}</mark>${post_text}`;
+    });
+
+    return query;
+  }
+
 }
 
+interface QueryComponent {
+  start: number;
+  end: number;
+  match: string;
 }
