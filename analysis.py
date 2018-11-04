@@ -44,6 +44,158 @@ def analyze(execution_plan, query):
 
     return execution_plan, formatted_query
 
+
+def analyze_plan(plan, query):
+    if 'Plans' in plan.keys():
+        for sub_plan in plan['Plans']:
+            analyze_plan(sub_plan, query)
+
+    plan['Query'] = get_query_components(plan, query)
+    plan['Actual Duration'] = calculate_actual_duration(plan)
+    plan['Actual Cost'] = calculate_actual_cost(plan)
+    plan['Estimate Errors'] = calculate_estimate_errors(plan)
+    plan['Description'] = get_node_description(plan)
+
+def get_query_components(plan, query):
+
+    query_components = []
+
+    # Limit: Keyword Limit with number
+    if plan['Node Type'] == 'Limit':
+        query_components = parse_limit(plan, query)
+
+    # Sort: Sort key, Or Inherits the query from its parent (If the node of ’Sort’ is a child of another node with strategy ‘sorter’)
+    # elif plan['Node Type'] == 'Sort':
+    #     query_components = parse_sort(plan, query)
+
+    # Scan: scanned table, filter condition, index condition, recheck condition (deal with '::text', 'LIKE' --> '~~')
+    # elif plan['Node Type'] in ['Seq Scan', 'Index Scan', 'Index Only Scan', 'Bitmap Index Scan', 'Bitmap Heap Scan', 'CTE Scan']:
+    #     query_components = parse_scan(plan, query)
+
+    # Hash Join: join condition (might reverse order)
+    # elif plan['Node Type'] == 'Hash Join':
+    #     query_components = parse_hash_join(plan, query)
+
+    # Merge Join: join condition (might reverse order)
+    # elif plan['Node Type'] == 'Merge Join':
+    #     query_components = parse_merge_join(plan, query)
+
+    # Nested Loop: query components from its child nodes
+    elif plan['Node Type'] == 'Nested Loop':
+        query_components = parse_nested_loop(plan, query)
+
+    # Aggregates: Group Key
+    # elif plan['Node Type'] in ['Aggregate', 'GroupAggregate', 'HashAggregate']:
+    #     query_components = parse_aggregate(plan, query)
+
+    # Hash: Hashed table (take from child nodes)
+    elif plan['Node Type'] == 'Hash':
+        query_components = parse_hash(plan, query)
+
+    # Gathers: gathered columns
+    # elif plan['Node Type'] in ['Gather', 'Gather Merge']:
+    #     query_components = parse_gather(plan, query)
+
+    # Unique: Keyword DISTINCT with column(s)
+    # elif plan['Node Type'] == 'Unique':
+    #     query_components = parse_unique(plan, query)
+
+    else:
+        query_components = parse_general(plan, query)
+
+    print(query_components)
+    return [query_components]
+
+def parse_sort(plan, query):
+
+    sort_keys_regex = []
+
+    sort_keys = plan['Sort Key']
+    for sort_key in sort_keys:
+        # descending keys are surrounded by parenthesis
+        desc = sort_key.startswith("(") and sort_key.endswith(")")
+        direction = "DESC" if desc else "ASC"
+
+        # remove surrounding parenthesis
+        sort_key = sort_key[1:-1] if desc else sort_key
+
+        # escape parenthesis for function calls
+        sort_key = sort_key.replace("(", "\(").replace(")", "\)")
+
+        sort_keys_regex.append(QUERY_SORT_KEY_REGEX.format(sort_key, direction))
+
+    # join sort keys regex by comma
+    sort_keys_joined = ",\s*".join(sort_keys_regex)
+
+    regex = QUERY_SORT_REGEX.format(sort_keys_joined)
+    return [find_matching_query(regex, query)]
+
+def parse_limit(plan, query):
+    regex = QUERY_LIMIT_REGEX.format(plan['Plan Rows'])
+    return [find_matching_query(regex, query)]
+
+def parse_scan(plan, query):
+    query_components = []
+    if all(key in plan for key in ['Relation Name', 'Alias']):
+        relation_regex = QUERY_SCAN_RELATION_REGEX.format(plan['Relation Name'], plan['Alias'])
+        re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query)
+        from_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query))
+        relation_component = find_matching_query(relation_regex, from_clause.group(), from_clause.start())
+        query_components.append(relation_component)
+
+    where_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('WHERE'), query))
+    conditions = []
+    for key in ['Filter', 'Index Cond']:
+        if key in plan:
+            key_conditions = parse_filters(plan[key])
+            conditions = conditions + key_conditions
+
+    for condition in conditions:
+        condition_regex = re.sub(r"\w+\.", r"(\\w+)?", condition)
+        condition_component = find_matching_query(condition_regex, where_clause.group(), where_clause.start())
+        if condition_component:
+            query_components.append(condition_component)
+    return query_components
+
+def parse_nested_loop(plan, query):
+    query_components = []
+    for subplan in plan['Plans']:
+        query_components = query_components + subplan['Query']
+    return query_components
+
+def parse_hash(plan, query):
+    query_components = []
+    for subplan in plan['Plans']:
+        query_components = query_components + subplan['Query']
+    return query_components
+
+def parse_general(plan, query):
+    return [plan['Node Type']]
+
+def find_matching_query(regex, query, offset=0):
+    search = re.finditer(regex, query, re.IGNORECASE)
+    result = next(search, None)
+    if result is not None:
+        return {
+            'start': offset + result.start(),
+            'end': offset + result.end(),
+            'match': result.group().upper()
+        }
+
+def extract_conditions(layers):
+    conditions = []
+    if len(layers) == 1:
+        return [layers[0]] if isinstance(layers[0], str) else [extract_conditions(layers[0])]
+    for layer in layers:
+        if isinstance(layer, list):
+            conditions = conditions + extract_conditions(layer)
+    return conditions
+
+def parse_filters(filters):
+    filters = re.sub(FILTERS_PAREN_REGEX, "\g<1>", filters)
+    filters = re.sub(FILTERS_QUOTE_REGEX, "'\g<1>'",filters)
+    return extract_conditions(parse_nested(filters))
+
 def get_node_description(plan):
 
     description = ''
@@ -126,7 +278,7 @@ def get_greatest_errors(plan):
 
     if 'Plans' in plan:
         for sub_plan in plan['Plans']:
-            error = max(error, get_greatest_error(sub_plan))
+            error = max(error, get_greatest_errors(sub_plan))
         return error
     return error
 
@@ -157,149 +309,12 @@ def find_largest_node(plan, largest_size):
         for sub_plan in plan['Plans']:
             find_largest_node(sub_plan, largest_size)
 
-
-def analyze_plan(plan, query):
-    # plan['Query'] = get_query_components(plan, query)
-    plan['Actual Duration'] = calculate_actual_duration(plan)
-    plan['Actual Cost'] = calculate_actual_cost(plan)
-    plan['Estimate Errors'] = calculate_estimate_errors(plan)
-    plan['Description'] = get_node_description(plan)
-
-    if 'Plans' in plan.keys():
-        for sub_plan in plan['Plans']:
-            analyze_plan(sub_plan, query)
-
-def get_query_components(plan, query):
-
-    query_components = []
-
-    # Limit: Keyword Limit with number
-    if plan['Node Type'] == 'Limit':
-        query_components = parse_limit(plan, query)
-
-    # Sort: Sort key, Or Inherits the query from its parent (If the node of ’Sort’ is a child of another node with strategy ‘sorter’)
-    elif plan['Node Type'] == 'Sort':
-        query_components = parse_sort(plan, query)
-
-    # Scan: scanned table, filter condition, index condition, recheck condition (deal with '::text', 'LIKE' --> '~~')
-    elif plan['Node Type'] in ['Seq Scan', 'Index Scan', 'Index Only Scan', 'Bitmap Index Scan', 'Bitmap Heap Scan', 'CTE Scan']:
-        query_components = parse_scan(plan, query)
-
-    # Hash Join: join condition (might reverse order)
-    # elif plan['Node Type'] == 'Hash Join':
-    #     query_components = parse_hash_join(plan, query)
-
-    # Merge Join: join condition (might reverse order)
-    # elif plan['Node Type'] == 'Merge Join':
-    #     query_components = parse_merge_join(plan, query)
-
-    # Nested Loop: query components from its child nodes
-    # elif plan['Node Type'] == 'Nested Loop':
-    #     query_components = parse_merge_join(plan, query)
-
-    # Gathers: gathered columns
-    # elif plan['Node Type'] in ['Gather', 'Gather Merge']:
-    #     query_components = parse_gather(plan, query)
-
-    # Aggregates: Group Key
-    # elif plan['Node Type'] in ['Aggregate', 'GroupAggregate', 'HashAggregate']:
-    #     query_components = parse_aggregate(plan, query)
-
-    # Hash: Hashed table (take from child nodes)
-    # elif plan['Node Type'] == 'Hash':
-    #     query_components = parse_hash(plan, query)
-
-    # Unique: Keyword DISTINCT with column(s)
-    # elif plan['Node Type'] == 'Unique':
-    #     query_components = parse_unique(plan, query)
-
-    # else:
-    #     query_components = parse_general(plan, query)
-
-    return [c.upper() for c in query_components]
-
-def parse_sort(plan, query):
-
-    sort_keys_regex = []
-
-    sort_keys = plan['Sort Key']
-    for sort_key in sort_keys:
-        # descending keys are surrounded by parenthesis
-        desc = sort_key.startswith("(") and sort_key.endswith(")")
-        direction = "DESC" if desc else "ASC"
-
-        # remove surrounding parenthesis
-        sort_key = sort_key[1:-1] if desc else sort_key
-
-        # escape parenthesis for function calls
-        sort_key = sort_key.replace("(", "\(").replace(")", "\)")
-
-        sort_keys_regex.append(QUERY_SORT_KEY_REGEX.format(sort_key, direction))
-
-    # join sort keys regex by comma
-    sort_keys_joined = ",\s*".join(sort_keys_regex)
-
-    regex = QUERY_SORT_REGEX.format(sort_keys_joined)
-    return [find_matching_query(regex, query)]
-
-def parse_limit(plan, query):
-    regex = QUERY_LIMIT_REGEX.format(plan['Plan Rows'])
-    return [find_matching_query(regex, query)]
-
-def parse_scan(plan, query):
-    query_components = []
-    if all(key in plan for key in ['Relation Name', 'Alias']):
-        relation_regex = QUERY_SCAN_RELATION_REGEX.format(plan['Relation Name'], plan['Alias'])
-        re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query)
-        from_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query))
-        relation_component = find_matching_query(relation_regex, from_clause.group(), from_clause.start())
-        query_components.append(relation_component)
-
-    where_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('WHERE'), query))
-    conditions = []
-    for key in ['Filter', 'Index Cond']:
-        if key in plan:
-            key_conditions = parse_filters(plan[key])
-            conditions = conditions + key_conditions
-
-    for condition in conditions:
-        condition_regex = re.sub(r"\w+\.", r"(\\w+)?", condition)
-        condition_component = find_matching_query(condition_regex, where_clause.group(), where_clause.start())
-        if condition_component:
-            query_components.append(condition_component)
-    return query_components
-
-def find_matching_query(regex, query, offset=0):
-    search = re.finditer(regex, query, re.IGNORECASE)
-    result = next(search, None)
-    if result is not None:
-        return {
-            'start': offset + result.start(),
-            'end': offset + result.end(),
-            'match': result.group()
-        }
-
-def extract_conditions(layers):
-    conditions = []
-    if len(layers) == 1:
-        return [layers[0]] if isinstance(layers[0], str) else [extract_conditions(layers[0])]
-    for layer in layers:
-        if isinstance(layer, list):
-            conditions = conditions + extract_conditions(layer)
-    return conditions
-
-def parse_filters(filters):
-    filters = re.sub(FILTERS_PAREN_REGEX, "\g<1>", filters)
-    filters = re.sub(FILTERS_QUOTE_REGEX, "'\g<1>'",filters)
-    return extract_conditions(parse_nested(filters))
-
-
 tests = read_json('tests.json')
 print('Available Test Cases:')
 for i, test in enumerate(tests):
     print(str(i) + '. ' + test['Test Case'])
 
-test = tests[-2]
+test = tests[19]
 execution_plan = test['Execution Plan']
-execution_plan
+query = format(test['Query'])
 analyze(execution_plan, query)
