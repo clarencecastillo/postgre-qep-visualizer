@@ -804,7 +804,7 @@
         "Expected Query": [{
           "start": 92,
           "end": 118,
-          "Query": "P.PUBKEY = I.INPROCROSSREF"
+          "match": "P.PUBKEY = I.INPROCROSSREF"
         }],
         "Plans": [{
             "Node Type": "Seq Scan",
@@ -835,7 +835,7 @@
             "Expected Query": [{
               "start": 50,
               "end": 62,
-              "Query": "INPROCEEDING"
+              "match": "INPROCEEDING"
             }]
           },
           {
@@ -869,7 +869,7 @@
             "Expected Query": [{
               "start": 70,
               "end": 80,
-              "Query": "PROCEEDING"
+              "match": "PROCEEDING"
             }],
             "Plans": [{
               "Node Type": "Seq Scan",
@@ -900,7 +900,7 @@
               "Expected Query": [{
                 "start": 70,
                 "end": 80,
-                "Query": "PROCEEDING"
+                "match": "PROCEEDING"
               }]
             }]
           }
@@ -945,7 +945,7 @@
         "Expected Query": [{
           "start": 102,
           "end": 148,
-          "Query": "PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"
+          "match": "PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"
         }],
         "Plans": [{
             "Node Type": "Sort",
@@ -977,7 +977,7 @@
             "Expected Query": [{
               "start": 70,
               "end": 82,
-              "Query": "INPROCEEDING"
+              "match": "INPROCEEDING"
             }],
             "Plans": [{
               "Node Type": "Seq Scan",
@@ -1008,7 +1008,7 @@
               "Expected Query": [{
                 "start": 70,
                 "end": 82,
-                "Query": "INPROCEEDING"
+                "match": "INPROCEEDING"
               }]
             }]
           },
@@ -1042,7 +1042,7 @@
             "Expected Query": [{
               "start": 85,
               "end": 95,
-              "Query": "PROCEEDING"
+              "match": "PROCEEDING"
             }],
             "Plans": [{
               "Node Type": "Seq Scan",
@@ -1073,7 +1073,7 @@
               "Expected Query": [{
                 "start": 85,
                 "end": 95,
-                "Query": "PROCEEDING"
+                "match": "PROCEEDING"
               }]
             }]
           }
@@ -1116,15 +1116,15 @@
         "Expected Query": [{
           "start": 14,
           "end": 23,
-          "Query": "PUBLISHER"
+          "match": "PUBLISHER"
         }, {
           "start": 26,
           "end": 32,
-          "Query": "SCHOOL"
+          "match": "SCHOOL"
         }, {
           "start": 39,
           "end": 78,
-          "Query": "SCHOOL.schoolID = PUBLISHER.publisherID"
+          "match": "SCHOOL.schoolID = PUBLISHER.publisherID"
         }],
         "Plans": [{
             "Node Type": "Seq Scan",
@@ -1155,7 +1155,7 @@
             "Expected Query": [{
               "start": 26,
               "end": 32,
-              "Query": "SCHOOL"
+              "match": "SCHOOL"
             }]
           },
           {
@@ -1191,11 +1191,11 @@
             "Expected Query": [{
               "start": 14,
               "end": 23,
-              "Query": "PUBLISHER"
+              "match": "PUBLISHER"
             }, {
               "start": 39,
               "end": 78,
-              "Query": "SCHOOL.schoolID = PUBLISHER.publisherID"
+              "match": "SCHOOL.schoolID = PUBLISHER.publisherID"
             }]
           }
         ]
@@ -1238,15 +1238,15 @@
         "Expected Query": [{
           "start": 7,
           "end": 25,
-          "Query": "P.PROCEEDBOOKTITLE"
+          "match": "P.PROCEEDBOOKTITLE"
         }, {
           "start": 28,
           "end": 44,
-          "Query": "I.INPROBOOKTITLE"
+          "match": "I.INPROBOOKTITLE"
         }, {
           "start": 47,
           "end": 67,
-          "Query": "PUBLICATION.PUBTITLE"
+          "match": "PUBLICATION.PUBTITLE"
         }],
         "Plans": [{
           "Node Type": "Nested Loop",
@@ -1276,23 +1276,23 @@
           "Expected Query": [{
             "start": 73,
             "end": 85,
-            "Query": "INPROCEEDING"
+            "match": "INPROCEEDING"
           }, {
             "start": 93,
             "end": 103,
-            "Query": "PROCEEDING"
+            "match": "PROCEEDING"
           }, {
             "start": 111,
             "end": 122,
-            "Query": "PUBLICATION"
+            "match": "PUBLICATION"
           }, {
             "start": 162,
             "end": 191,
-            "Query": "I.PUBKEY = PUBLICATION.PUBKEY"
+            "match": "I.PUBKEY = PUBLICATION.PUBKEY"
           }, {
             "start": 129,
             "end": 155,
-            "Query": "P.PUBKEY = I.INPROCROSSREF"
+            "match": "P.PUBKEY = I.INPROCROSSREF"
           }],
           "Workers": [{
               "Worker Number": 0,
@@ -1357,15 +1357,15 @@
               "Expected Query": [{
                 "start": 73,
                 "end": 85,
-                "Query": "INPROCEEDING"
+                "match": "INPROCEEDING"
               }, {
                 "start": 93,
                 "end": 103,
-                "Query": "PROCEEDING"
+                "match": "PROCEEDING"
               }, {
                 "start": 129,
                 "end": 155,
-                "Query": "P.PUBKEY = I.INPROCROSSREF"
+                "match": "P.PUBKEY = I.INPROCROSSREF"
               }],
               "Workers": [{
                   "Worker Number": 0,
@@ -1431,7 +1431,7 @@
                   "Expected Query": [{
                     "start": 73,
                     "end": 85,
-                    "Query": "INPROCEEDING"
+                    "match": "INPROCEEDING"
                   }],
                   "Workers": [{
                       "Worker Number": 0,
@@ -1502,11 +1502,11 @@
                   "Expected Query": [{
                     "start": 93,
                     "end": 103,
-                    "Query": "PROCEEDING"
+                    "match": "PROCEEDING"
                   }, {
                     "start": 129,
                     "end": 155,
-                    "Query": "P.PUBKEY = I.INPROCROSSREF"
+                    "match": "P.PUBKEY = I.INPROCROSSREF"
                   }],
                   "Workers": [{
                       "Worker Number": 0,
@@ -1579,11 +1579,11 @@
               "Expected Query": [{
                 "start": 111,
                 "end": 122,
-                "Query": "PUBLICATION"
+                "match": "PUBLICATION"
               }, {
                 "start": 162,
                 "end": 191,
-                "Query": "I.PUBKEY = PUBLICATION.PUBKEY"
+                "match": "I.PUBKEY = PUBLICATION.PUBKEY"
               }],
               "Workers": [{
                   "Worker Number": 0,
@@ -2594,7 +2594,8 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 65,
+          "start": 65,
+          "end": 73,
           "Query": "LIMIT 10"
         }],
         "Plans": [{
@@ -2625,7 +2626,8 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 51,
+            "start": 51,
+            "end": 64,
             "Query": "ORDER BY YEAR"
           }],
           "Plans": [{
@@ -2655,7 +2657,8 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 39,
+              "start": 39,
+              "end": 50,
               "Query": "PUBLICATION"
             }]
           }]
