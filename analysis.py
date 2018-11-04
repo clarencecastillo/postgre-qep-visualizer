@@ -6,7 +6,7 @@ QUERY_LIMIT_REGEX = r"\bLIMIT\s+{0}"
 QUERY_SORT_REGEX = r"ORDER BY\s+{0}"
 QUERY_SORT_KEY_REGEX = r"{0}(\s+{1})?"
 QUERY_SCAN_REGEX = r"{0}(\s+{1})?"
-QUERY_SCAN_RELATION_REGEX = r"(?=[\s,]){0}(\s+{1})?"
+QUERY_SCAN_RELATION_REGEX = r"(?<=[\s,]){0}(\s+{1})?"
 QUERY_CLAUSE_REGEX = r'\n({0}\s.*\n?(\t+.*\n?)*)(?<!\t)'
 
 FILTERS_PAREN_REGEX = r"\(([\%\w\.\/]+)\)::[a-z]+"
