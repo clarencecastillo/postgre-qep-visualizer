@@ -2,6 +2,7 @@ from flask import Flask, request, send_from_directory, redirect, jsonify
 from flask_cors import CORS
 import os
 from analysis import analyze
+from parser import parse
 
 # set the project root directory as the static folder, you can set others.
 app = Flask(__name__)
@@ -14,7 +15,8 @@ def index():
 @app.route('/api/parse', methods=['POST'])
 def api():
     data = request.get_json()
-    plan, query = analyze(data['plan'], data['query'])
+    plan, query = parse(data['plan'], data['query'])
+    plan = analyze(plan)
     return jsonify({
         'plan': plan,
         'query': query

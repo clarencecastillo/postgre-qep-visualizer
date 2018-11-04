@@ -20,6 +20,10 @@
             on <code>{{plan['Schema']}}.{{plan['Relation Name']}} ({{plan['Alias']}})</code>
           </small>
         </div>
+        <small class="badge badge-danger mr-1" *ngIf="plan['Is Slowest']">Slowest</small>
+        <small class="badge badge-danger mr-1" *ngIf="plan['Is Largest']">Largest</small>
+        <small class="badge badge-danger mr-1" *ngIf="plan['Is Costliest']">Costliest</small>
+        <small class="badge badge-danger mr-1" *ngIf="plan['Has Greatest Errors']">Most Errors</small>
       </div>
     </div>
   </div>
