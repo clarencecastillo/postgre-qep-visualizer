@@ -2975,7 +2975,8 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 7,
+          "start": 7,
+          "end": 34,
           "match": "DISTINCT PUBLICATION.PUBKEY"
         }],
         "Plans": [{
@@ -3008,7 +3009,8 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 40,
+            "start": 40,
+            "end": 51,
             "match": "PUBLICATION"
           }]
         }]
