@@ -802,7 +802,8 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 92,
+          "start": 92,
+          "end": 118,
           "Query": "P.PUBKEY = I.INPROCROSSREF"
         }],
         "Plans": [{
@@ -832,7 +833,8 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 50,
+              "start": 50,
+              "end": 62,
               "Query": "INPROCEEDING"
             }]
           },
@@ -865,7 +867,8 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 70,
+              "start": 70,
+              "end": 80,
               "Query": "PROCEEDING"
             }],
             "Plans": [{
@@ -895,7 +898,8 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 70,
+                "start": 70,
+                "end": 80,
                 "Query": "PROCEEDING"
               }]
             }]
@@ -939,7 +943,8 @@
         "Temp Read Blocks": 1358,
         "Temp Written Blocks": 1365,
         "Expected Query": [{
-          "Index": 102,
+          "start": 102,
+          "end": 148,
           "Query": "PROCEEDING.PUBKEY = INPROCEEDING.INPROCROSSREF"
         }],
         "Plans": [{
@@ -970,7 +975,8 @@
             "Temp Read Blocks": 1358,
             "Temp Written Blocks": 1365,
             "Expected Query": [{
-              "Index": 70,
+              "start": 70,
+              "end": 82,
               "Query": "INPROCEEDING"
             }],
             "Plans": [{
@@ -1000,7 +1006,8 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 70,
+                "start": 70,
+                "end": 82,
                 "Query": "INPROCEEDING"
               }]
             }]
@@ -1033,7 +1040,8 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 85,
+              "start": 85,
+              "end": 95,
               "Query": "PROCEEDING"
             }],
             "Plans": [{
@@ -1063,7 +1071,8 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 85,
+                "start": 85,
+                "end": 95,
                 "Query": "PROCEEDING"
               }]
             }]
@@ -1105,13 +1114,16 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 14,
+          "start": 14,
+          "end": 23,
           "Query": "PUBLISHER"
         }, {
-          "Index": 26,
+          "start": 26,
+          "end": 32,
           "Query": "SCHOOL"
         }, {
-          "Index": 39,
+          "start": 39,
+          "end": 78,
           "Query": "SCHOOL.schoolID = PUBLISHER.publisherID"
         }],
         "Plans": [{
@@ -1141,7 +1153,8 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 26,
+              "start": 26,
+              "end": 32,
               "Query": "SCHOOL"
             }]
           },
@@ -1176,10 +1189,12 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 14,
+              "start": 14,
+              "end": 23,
               "Query": "PUBLISHER"
             }, {
-              "Index": 39,
+              "start": 39,
+              "end": 78,
               "Query": "SCHOOL.schoolID = PUBLISHER.publisherID"
             }]
           }
@@ -1221,13 +1236,16 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 7,
+          "start": 7,
+          "end": 25,
           "Query": "P.PROCEEDBOOKTITLE"
         }, {
-          "Index": 28,
+          "start": 28,
+          "end": 44,
           "Query": "I.INPROBOOKTITLE"
         }, {
-          "Index": 47,
+          "start": 47,
+          "end": 67,
           "Query": "PUBLICATION.PUBTITLE"
         }],
         "Plans": [{
@@ -1256,19 +1274,24 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 73,
+            "start": 73,
+            "end": 85,
             "Query": "INPROCEEDING"
           }, {
-            "Index": 93,
+            "start": 93,
+            "end": 103,
             "Query": "PROCEEDING"
           }, {
-            "Index": 111,
+            "start": 111,
+            "end": 122,
             "Query": "PUBLICATION"
           }, {
-            "Index": 162,
+            "start": 162,
+            "end": 191,
             "Query": "I.PUBKEY = PUBLICATION.PUBKEY"
           }, {
-            "Index": 129,
+            "start": 129,
+            "end": 155,
             "Query": "P.PUBKEY = I.INPROCROSSREF"
           }],
           "Workers": [{
@@ -1332,13 +1355,16 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 73,
+                "start": 73,
+                "end": 85,
                 "Query": "INPROCEEDING"
               }, {
-                "Index": 93,
+                "start": 93,
+                "end": 103,
                 "Query": "PROCEEDING"
               }, {
-                "Index": 129,
+                "start": 129,
+                "end": 155,
                 "Query": "P.PUBKEY = I.INPROCROSSREF"
               }],
               "Workers": [{
@@ -1403,7 +1429,8 @@
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
                   "Expected Query": [{
-                    "Index": 73,
+                    "start": 73,
+                    "end": 85,
                     "Query": "INPROCEEDING"
                   }],
                   "Workers": [{
@@ -1473,10 +1500,12 @@
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
                   "Expected Query": [{
-                    "Index": 93,
+                    "start": 93,
+                    "end": 103,
                     "Query": "PROCEEDING"
                   }, {
-                    "Index": 129,
+                    "start": 129,
+                    "end": 155,
                     "Query": "P.PUBKEY = I.INPROCROSSREF"
                   }],
                   "Workers": [{
@@ -1548,10 +1577,12 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 111,
+                "start": 111,
+                "end": 122,
                 "Query": "PUBLICATION"
               }, {
-                "Index": 162,
+                "start": 162,
+                "end": 191,
                 "Query": "I.PUBKEY = PUBLICATION.PUBKEY"
               }],
               "Workers": [{
@@ -1631,8 +1662,9 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 77,
-          "Query": "GROUP BY PUBLICATION.PUBTYPE"
+          "start": 77,
+          "end": 127,
+          "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
         }],
         "Plans": [{
           "Node Type": "Sort",
@@ -1662,7 +1694,8 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 77,
+            "start": 77,
+            "end": 127,
             "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
           }],
           "Plans": [{
@@ -1692,13 +1725,16 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 7,
+              "start": 7,
+              "end": 26,
               "Query": "PUBLICATION.PUBTYPE"
             }, {
-              "Index": 29,
+              "start": 29,
+              "end": 48,
               "Query": "PUBLICATION.PUBYEAR"
             }, {
-              "Index": 51,
+              "start": 51,
+              "end": 59,
               "Query": "COUNT(*)"
             }],
             "Plans": [{
@@ -1728,7 +1764,8 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 77,
+                "start": 77,
+                "end": 127,
                 "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
               }],
               "Workers": [{
@@ -1793,7 +1830,8 @@
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
                 "Expected Query": [{
-                  "Index": 65,
+                  "start": 65,
+                  "end": 76,
                   "Query": "PUBLICATION"
                 }],
                 "Workers": [{
@@ -1875,10 +1913,12 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 77,
+          "start": 77,
+          "end": 127,
           "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
         }, {
-          "Index": 128,
+          "start": 128,
+          "end": 149,
           "Query": "HAVING COUNT(*) >= 10"
         }],
         "Plans": [{
@@ -1909,7 +1949,8 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 77,
+            "start": 77,
+            "end": 127,
             "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
           }],
           "Plans": [{
@@ -1939,13 +1980,16 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 7,
+              "start": 7,
+              "end": 26,
               "Query": "PUBLICATION.PUBTYPE"
             }, {
-              "Index": 29,
+              "start": 29,
+              "end": 48,
               "Query": "PUBLICATION.PUBYEAR"
             }, {
-              "Index": 51,
+              "start": 51,
+              "end": 59,
               "Query": "COUNT(*)"
             }],
             "Plans": [{
@@ -1975,7 +2019,8 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 77,
+                "start": 77,
+                "end": 127,
                 "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
               }],
               "Workers": [{
@@ -2040,7 +2085,8 @@
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
                 "Expected Query": [{
-                  "Index": 65,
+                  "start": 65,
+                  "end": 76,
                   "Query": "PUBLICATION"
                 }],
                 "Workers": [{
@@ -2122,7 +2168,8 @@
         "Temp Read Blocks": 7116,
         "Temp Written Blocks": 7142,
         "Expected Query": [{
-          "Index": 65,
+          "start": 65,
+          "end": 93,
           "Query": "ORDER BY PUBLICATION.PUBYEAR"
         }],
         "Plans": [{
@@ -2152,7 +2199,8 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 53,
+            "start": 53,
+            "end": 64,
             "Query": "PUBLICATION"
           }]
         }]
@@ -2194,7 +2242,8 @@
         "Temp Read Blocks": 7104,
         "Temp Written Blocks": 7130,
         "Expected Query": [{
-          "Index": 65,
+          "start": 41,
+          "end": 75,
           "Query": "ORDER BY PUBYEAR DESC,\n\tPUBKEY ASC"
         }],
         "Plans": [{
@@ -2224,7 +2273,8 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 29,
+            "start": 29,
+            "end": 40,
             "Query": "PUBLICATION"
           }]
         }]
@@ -2266,7 +2316,8 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "Index": 140,
+          "start": 140,
+          "end": 184,
           "Query": "ORDER BY PUBCOUNT DESC,\n\tPUBLICATION.PUBYEAR"
         }],
         "Plans": [{
@@ -2296,7 +2347,8 @@
           "Temp Read Blocks": 0,
           "Temp Written Blocks": 0,
           "Expected Query": [{
-            "Index": 89,
+            "start": 89,
+            "end": 139,
             "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
           }],
           "Plans": [{
@@ -2327,7 +2379,8 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "Index": 89,
+              "start": 89,
+              "end": 139,
               "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
             }],
             "Plans": [{
@@ -2357,13 +2410,16 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "Index": 7,
+                "start": 7,
+                "end": 26,
                 "Query": "PUBLICATION.PUBYEAR"
               }, {
-                "Index": 29,
+                "start": 29,
+                "end": 48,
                 "Query": "PUBLICATION.PUBTYPE"
               }, {
-                "Index": 51,
+                "start": 51,
+                "end": 59,
                 "Query": "COUNT(*)"
               }],
               "Plans": [{
@@ -2393,7 +2449,8 @@
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
                 "Expected Query": [{
-                  "Index": 89,
+                  "start": 89,
+                  "end": 139,
                   "Query": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
                 }],
                 "Workers": [{
@@ -2458,7 +2515,8 @@
                   "Temp Read Blocks": 0,
                   "Temp Written Blocks": 0,
                   "Expected Query": [{
-                    "Index": 77,
+                    "start": 77,
+                    "end": 88,
                     "Query": "PUBLICATION"
                   }],
                   "Workers": [{
