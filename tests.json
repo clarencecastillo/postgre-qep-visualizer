@@ -975,9 +975,9 @@
             "Temp Read Blocks": 1358,
             "Temp Written Blocks": 1365,
             "Expected Query": [{
-              "start": 70,
-              "end": 82,
-              "match": "INPROCEEDING"
+              "start": 122,
+              "end": 148,
+              "match": "INPROCEEDING.INPROCROSSREF"
             }],
             "Plans": [{
               "Node Type": "Seq Scan",
@@ -1040,9 +1040,9 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "start": 85,
-              "end": 95,
-              "match": "PROCEEDING"
+              "start": 102,
+              "end": 119,
+              "match": "PROCEEDING.PUBKEY"
             }],
             "Plans": [{
               "Node Type": "Seq Scan",
@@ -1124,7 +1124,7 @@
         }, {
           "start": 39,
           "end": 78,
-          "match": "SCHOOL.schoolID = PUBLISHER.publisherID"
+          "match": "SCHOOL.SCHOOLID = PUBLISHER.PUBLISHERID"
         }],
         "Plans": [{
             "Node Type": "Seq Scan",
@@ -1195,7 +1195,7 @@
             }, {
               "start": 39,
               "end": 78,
-              "match": "SCHOOL.schoolID = PUBLISHER.publisherID"
+              "match": "SCHOOL.SCHOOLID = PUBLISHER.PUBLISHERID"
             }]
           }
         ]
@@ -1236,17 +1236,25 @@
         "Temp Read Blocks": 0,
         "Temp Written Blocks": 0,
         "Expected Query": [{
-          "start": 7,
-          "end": 25,
-          "match": "P.PROCEEDBOOKTITLE"
+          "start": 73,
+          "end": 85,
+          "match": "INPROCEEDING"
         }, {
-          "start": 28,
-          "end": 44,
-          "match": "I.INPROBOOKTITLE"
+          "start": 93,
+          "end": 103,
+          "match": "PROCEEDING"
         }, {
-          "start": 47,
-          "end": 67,
-          "match": "PUBLICATION.PUBTITLE"
+          "start": 111,
+          "end": 122,
+          "match": "PUBLICATION"
+        }, {
+          "start": 162,
+          "end": 191,
+          "match": "I.PUBKEY = PUBLICATION.PUBKEY"
+        }, {
+          "start": 129,
+          "end": 155,
+          "match": "P.PUBKEY = I.INPROCROSSREF"
         }],
         "Plans": [{
           "Node Type": "Nested Loop",
@@ -1725,17 +1733,9 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "start": 7,
-              "end": 26,
-              "match": "PUBLICATION.PUBTYPE"
-            }, {
-              "start": 29,
-              "end": 48,
-              "match": "PUBLICATION.PUBYEAR"
-            }, {
-              "start": 51,
-              "end": 59,
-              "match": "COUNT(*)"
+              "start": 77,
+              "end": 127,
+              "match": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
             }],
             "Plans": [{
               "Node Type": "Aggregate",
@@ -1980,17 +1980,9 @@
             "Temp Read Blocks": 0,
             "Temp Written Blocks": 0,
             "Expected Query": [{
-              "start": 7,
-              "end": 26,
-              "match": "PUBLICATION.PUBTYPE"
-            }, {
-              "start": 29,
-              "end": 48,
-              "match": "PUBLICATION.PUBYEAR"
-            }, {
-              "start": 51,
-              "end": 59,
-              "match": "COUNT(*)"
+              "start": 77,
+              "end": 127,
+              "match": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
             }],
             "Plans": [{
               "Node Type": "Aggregate",
@@ -2410,17 +2402,9 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0,
               "Expected Query": [{
-                "start": 7,
-                "end": 26,
-                "match": "PUBLICATION.PUBYEAR"
-              }, {
-                "start": 29,
-                "end": 48,
-                "match": "PUBLICATION.PUBTYPE"
-              }, {
-                "start": 51,
-                "end": 59,
-                "match": "COUNT(*)"
+                "start": 89,
+                "end": 139,
+                "match": "GROUP BY PUBLICATION.PUBTYPE,\n\tPUBLICATION.PUBYEAR"
               }],
               "Plans": [{
                 "Node Type": "Aggregate",
@@ -2731,13 +2715,9 @@
           "Temp Read Blocks": 15886,
           "Temp Written Blocks": 15959,
           "Expected Query": [{
-            "start": 7,
-            "end": 20,
-            "match": "AUTHORSHIP.PERSONKEY"
-          }, {
-            "start": 39,
-            "end": 47,
-            "match": "COUNT(*)"
+            "start": 55,
+            "end": 84,
+            "match": "GROUP BY AUTHORSHIP.PERSONKEY"
           }],
           "Plans": [{
             "Node Type": "Aggregate",
