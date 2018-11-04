@@ -2701,8 +2701,9 @@
         "Temp Read Blocks": 5261,
         "Temp Written Blocks": 5285,
         "Expected Query": [{
-          "Index": 55,
-          "Query": "GROUP BY AUTHORSHIP.PERSONKEY"
+          "start": 55,
+          "end": 84,
+          "match": "GROUP BY AUTHORSHIP.PERSONKEY"
         }],
         "Plans": [{
           "Node Type": "Gather Merge",
@@ -2730,11 +2731,13 @@
           "Temp Read Blocks": 15886,
           "Temp Written Blocks": 15959,
           "Expected Query": [{
-            "Index": 7,
-            "Query": "AUTHORSHIP.PERSONKEY"
+            "start": 7,
+            "end": 20,
+            "match": "AUTHORSHIP.PERSONKEY"
           }, {
-            "Index": 30,
-            "Query": "COUNT(*)"
+            "start": 39,
+            "end": 47,
+            "match": "COUNT(*)"
           }],
           "Plans": [{
             "Node Type": "Aggregate",
@@ -2763,8 +2766,9 @@
             "Temp Read Blocks": 15886,
             "Temp Written Blocks": 15959,
             "Expected Query": [{
-              "Index": 55,
-              "Query": "GROUP BY AUTHORSHIP.PERSONKEY"
+              "start": 55,
+              "end": 84,
+              "match": "GROUP BY AUTHORSHIP.PERSONKEY"
             }],
             "Workers": [{
                 "Worker Number": 0,
@@ -2829,8 +2833,9 @@
               "Temp Read Blocks": 15886,
               "Temp Written Blocks": 15959,
               "Expected Query": [{
-                "Index": 55,
-                "Query": "GROUP BY AUTHORSHIP.PERSONKEY"
+                "start": 55,
+                "end": 84,
+                "match": "GROUP BY AUTHORSHIP.PERSONKEY"
               }],
               "Workers": [{
                   "Worker Number": 0,
@@ -2894,8 +2899,9 @@
                 "Temp Read Blocks": 0,
                 "Temp Written Blocks": 0,
                 "Expected Query": [{
-                  "Index": 44,
-                  "Query": "AUTHORSHIP"
+                  "start": 44,
+                  "end": 54,
+                  "match": "AUTHORSHIP"
                 }],
                 "Workers": [{
                     "Worker Number": 0,
@@ -2970,7 +2976,7 @@
         "Temp Written Blocks": 0,
         "Expected Query": [{
           "Index": 7,
-          "Query": "DISTINCT PUBLICATION.PUBKEY"
+          "match": "DISTINCT PUBLICATION.PUBKEY"
         }],
         "Plans": [{
           "Node Type": "Index Only Scan",
@@ -3003,7 +3009,7 @@
           "Temp Written Blocks": 0,
           "Expected Query": [{
             "Index": 40,
-            "Query": "PUBLICATION"
+            "match": "PUBLICATION"
           }]
         }]
       },
