@@ -106,8 +106,8 @@ def get_query_components(plan, query):
         query_components = parse_synthesised(plan, query)
 
     # Unique: Keyword DISTINCT with column(s)
-    # elif plan['Node Type'] == 'Unique':
-    #     query_components = parse_unique(plan, query)
+    elif plan['Node Type'] == 'Unique':
+        query_components = parse_unique(plan, query)
 
     else:
         query_components = parse_general(plan, query)
@@ -117,6 +117,13 @@ def get_query_components(plan, query):
 def parse_aggregate(plan, query):
     group_by_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('GROUP BY'), query))
     return [find_matching_query(group_by_clause.group(), query)]
+
+def parse_unique(plan, query):
+    distinct_on = find_matching_query(QUERY_DISTINCT_ON_REGEX, query)
+    if distinct_on:
+        return [distinct_on]
+
+    return [find_matching_query(QUERY_CLAUSE_REGEX.format('DISTINCT'), query)]
 
 def parse_synthesised(plan, query):
     if 'Plans' not in plan:
