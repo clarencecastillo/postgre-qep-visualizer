@@ -1,15 +1,16 @@
 from utils import format, read_json, parse_nested
+import itertools
 import re
 
 QUERY_LIMIT_REGEX = r"\bLIMIT\s+{0}"
 QUERY_SORT_REGEX = r"ORDER BY\s+{0}"
 QUERY_SORT_KEY_REGEX = r"{0}(\s+{1})?"
 QUERY_SCAN_REGEX = r"{0}(\s+{1})?"
-QUERY_SCAN_RELATION_REGEX = r"{0}(\s+{1})?"
-QUERY_CLAUSE_REGEX = r'\n({0}.*\n(\t+.*\n)+)(?<!\t)'
+QUERY_SCAN_RELATION_REGEX = r"(?=[\s,]){0}(\s+{1})?"
+QUERY_CLAUSE_REGEX = r'\n({0}\s.*\n?(\t+.*\n?)*)(?<!\t)'
 
-FILTERS_PAREN_REGEX = r"\(([\w\.]+)\)::[a-z]+"
-FILTERS_QUOTE_REGEX = r"'([\w\.]+)'::[a-z]+"
+FILTERS_PAREN_REGEX = r"\(([\%\w\.\/]+)\)::[a-z]+"
+FILTERS_QUOTE_REGEX = r"'([\%\w\.\/]+)'::[a-z]+"
 
 NODE_DESCRIPTIONS = {
     'Seq Scan': 'Scans the entire relation as stored on disk.',
@@ -28,19 +29,21 @@ NODE_DESCRIPTIONS = {
 
 def analyze(execution_plan, query):
     formatted_query = format(query)
-    analyze_plan(execution_plan['Plan'], formatted_query)
 
-    execution_plan['Longest Duration'] = get_longest_duration(execution_plan['Plan'])
-    find_slowest_node(execution_plan['Plan'], execution_plan['Longest Duration'])
+    root_plan = execution_plan['Plan']
+    analyze_plan(root_plan, formatted_query)
 
-    execution_plan['Highest Cost'] = get_longest_duration(execution_plan['Plan'])
-    find_costliest_node(execution_plan['Plan'], execution_plan['Highest Cost'])
+    execution_plan['Longest Duration'] = get_longest_duration(root_plan)
+    find_slowest_node(root_plan, execution_plan['Longest Duration'])
 
-    execution_plan['Greatest Errors'] = get_greatest_errors(execution_plan['Plan'])
-    find_greatest_errors_node(execution_plan['Plan'], execution_plan['Greatest Errors'])
+    execution_plan['Highest Cost'] = get_longest_duration(root_plan)
+    find_costliest_node(root_plan, execution_plan['Highest Cost'])
 
-    execution_plan['Largest Size'] = get_largest_nodes(execution_plan['Plan'])
-    find_largest_node(execution_plan['Plan'], execution_plan['Largest Size'])
+    execution_plan['Greatest Errors'] = get_greatest_errors(root_plan)
+    find_greatest_errors_node(root_plan, execution_plan['Greatest Errors'])
+
+    execution_plan['Largest Size'] = get_largest_nodes(root_plan)
+    find_largest_node(root_plan, execution_plan['Largest Size'])
 
     return execution_plan, formatted_query
 
@@ -65,16 +68,22 @@ def get_query_components(plan, query):
         query_components = parse_limit(plan, query)
 
     # Sort: Sort key, Or Inherits the query from its parent (If the node of ’Sort’ is a child of another node with strategy ‘sorter’)
-    # elif plan['Node Type'] == 'Sort':
-    #     query_components = parse_sort(plan, query)
+    elif plan['Node Type'] == 'Sort':
+        query_components = parse_sort(plan, query)
 
     # Scan: scanned table, filter condition, index condition, recheck condition (deal with '::text', 'LIKE' --> '~~')
-    # elif plan['Node Type'] in ['Seq Scan', 'Index Scan', 'Index Only Scan', 'Bitmap Index Scan', 'Bitmap Heap Scan', 'CTE Scan']:
-    #     query_components = parse_scan(plan, query)
+    elif plan['Node Type'] in ['Seq Scan', 'CTE Scan']:
+        query_components = parse_scan(plan, query, ['Filter'])
+
+    elif plan['Node Type'] in ['Index Scan', 'Index Only Scan', 'Bitmap Index Scan']:
+        query_components = parse_scan(plan, query, ['Filter', 'Index Cond'])
+
+    elif plan['Node Type'] == 'Bitmap Heap Scan':
+        query_components = parse_scan(plan, query, ['Recheck Cond'])
 
     # Hash Join: join condition (might reverse order)
-    # elif plan['Node Type'] == 'Hash Join':
-    #     query_components = parse_hash_join(plan, query)
+    elif plan['Node Type'] == 'Hash Join':
+        query_components = parse_scan(plan, query, ['Hash Cond'])
 
     # Merge Join: join condition (might reverse order)
     # elif plan['Node Type'] == 'Merge Join':
@@ -92,9 +101,9 @@ def get_query_components(plan, query):
     elif plan['Node Type'] == 'Hash':
         query_components = parse_hash(plan, query)
 
-    # Gathers: gathered columns
-    # elif plan['Node Type'] in ['Gather', 'Gather Merge']:
-    #     query_components = parse_gather(plan, query)
+    #Gathers: gathered columns
+    elif plan['Node Type'] in ['Gather', 'Gather Merge', 'BitmapOr']:
+        query_components = parse_synthesised(plan, query)
 
     # Unique: Keyword DISTINCT with column(s)
     # elif plan['Node Type'] == 'Unique':
@@ -103,8 +112,21 @@ def get_query_components(plan, query):
     else:
         query_components = parse_general(plan, query)
 
-    print(query_components)
-    return [query_components]
+    return query_components
+
+def parse_synthesised(plan, query):
+    if 'Plans' not in plan:
+        return []
+
+    query_components = []
+
+    for sub_plan in plan['Plans']:
+        sub_plan_query = sub_plan['Query']
+        for query in sub_plan_query:
+            if query not in query_components:
+                query_components.append(query)
+
+    return query_components
 
 def parse_sort(plan, query):
 
@@ -134,27 +156,28 @@ def parse_limit(plan, query):
     regex = QUERY_LIMIT_REGEX.format(plan['Plan Rows'])
     return [find_matching_query(regex, query)]
 
-def parse_scan(plan, query):
+def parse_scan(plan, query, keys):
     query_components = []
-    if all(key in plan for key in ['Relation Name', 'Alias']):
-        relation_regex = QUERY_SCAN_RELATION_REGEX.format(plan['Relation Name'], plan['Alias'])
-        re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query)
-        from_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query))
-        relation_component = find_matching_query(relation_regex, from_clause.group(), from_clause.start())
-        query_components.append(relation_component)
 
-    where_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('WHERE'), query))
-    conditions = []
-    for key in ['Filter', 'Index Cond']:
-        if key in plan:
-            key_conditions = parse_filters(plan[key])
-            conditions = conditions + key_conditions
+    if 'FROM' in query and all(key in plan for key in ['Relation Name', 'Alias']):
+            relation_regex = QUERY_SCAN_RELATION_REGEX.format(plan['Relation Name'], plan['Alias'])
+            from_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('FROM'), query))
+            relation_component = find_matching_query(relation_regex, from_clause.group(), from_clause.start())
+            query_components.append(relation_component)
 
-    for condition in conditions:
-        condition_regex = re.sub(r"\w+\.", r"(\\w+)?", condition)
-        condition_component = find_matching_query(condition_regex, where_clause.group(), where_clause.start())
-        if condition_component:
-            query_components.append(condition_component)
+    if 'WHERE' in query:
+        where_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('WHERE'), query))
+        conditions = []
+        for key in keys:
+            if key in plan:
+                key_conditions = parse_filters(plan[key])
+                conditions = conditions + key_conditions
+
+        for condition in conditions:
+            condition_regex = re.sub(r"\w+\.", r"(\\w+\.)?", condition)
+            condition_component = find_matching_query(condition_regex, where_clause.group(), where_clause.start())
+            if condition_component:
+                query_components.append(condition_component)
     return query_components
 
 def parse_nested_loop(plan, query):
@@ -185,15 +208,31 @@ def find_matching_query(regex, query, offset=0):
 def extract_conditions(layers):
     conditions = []
     if len(layers) == 1:
-        return [layers[0]] if isinstance(layers[0], str) else [extract_conditions(layers[0])]
+        condition = layers[0]
+        if isinstance(condition, str):
+            conditions = [condition]
+            # adds symmetric representation of the condition i.e. a == b
+            if ('=' in condition):
+                symmetric = ' '.join(condition.split(' ')[::-1])
+                conditions.append(symmetric)
+            return conditions
+        else:
+            return [extract_conditions(condition)]
     for layer in layers:
         if isinstance(layer, list):
             conditions = conditions + extract_conditions(layer)
     return conditions
 
 def parse_filters(filters):
+    # parse {0} ~~ {1} -> {0} LIKE {1}
+    filters = filters.replace("~~", "LIKE")
+
+    # parse ({0})::{1} -> {0}
     filters = re.sub(FILTERS_PAREN_REGEX, "\g<1>", filters)
+
+    # parse '{0}'::{1} -> '{0}'
     filters = re.sub(FILTERS_QUOTE_REGEX, "'\g<1>'",filters)
+
     return extract_conditions(parse_nested(filters))
 
 def get_node_description(plan):
@@ -216,7 +255,6 @@ def calculate_actual_duration(plan):
     # time is reported for an invidual loop
     # actual duration must be adjusted by number of loops
     actual_duration = actual_duration * plan['Actual Loops'];
-    print(actual_duration)
     return actual_duration;
 
 def get_longest_duration(plan):
@@ -249,7 +287,6 @@ def calculate_actual_cost(plan):
     # time is reported for an invidual loop
     # actual duration must be adjusted by number of loops
     actual_cost = actual_cost * plan['Actual Loops'];
-    print(actual_cost)
     return actual_cost;
 
 def get_highest_cost(plan):
@@ -310,11 +347,8 @@ def find_largest_node(plan, largest_size):
             find_largest_node(sub_plan, largest_size)
 
 tests = read_json('tests.json')
-print('Available Test Cases:')
-for i, test in enumerate(tests):
-    print(str(i) + '. ' + test['Test Case'])
-
-test = tests[19]
+test = tests[4]
 execution_plan = test['Execution Plan']
 query = format(test['Query'])
-analyze(execution_plan, query)
+e, q = analyze(execution_plan, query)
+e['Plan']['Query']
