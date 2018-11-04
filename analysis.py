@@ -86,16 +86,16 @@ def get_query_components(plan, query):
         query_components = parse_scan(plan, query, ['Hash Cond'])
 
     # Merge Join: join condition (might reverse order)
-    # elif plan['Node Type'] == 'Merge Join':
-    #     query_components = parse_merge_join(plan, query)
+    elif plan['Node Type'] == 'Merge Join':
+        query_components = parse_scan(plan, query, ['Merge Cond'])
 
     # Nested Loop: query components from its child nodes
     elif plan['Node Type'] == 'Nested Loop':
         query_components = parse_nested_loop(plan, query)
 
     # Aggregates: Group Key
-    # elif plan['Node Type'] in ['Aggregate', 'GroupAggregate', 'HashAggregate']:
-    #     query_components = parse_aggregate(plan, query)
+    elif plan['Node Type'] in ['Aggregate', 'GroupAggregate', 'HashAggregate']:
+        query_components = parse_aggregate(plan, query)
 
     # Hash: Hashed table (take from child nodes)
     elif plan['Node Type'] == 'Hash':
@@ -113,6 +113,10 @@ def get_query_components(plan, query):
         query_components = parse_general(plan, query)
 
     return query_components
+
+def parse_aggregate(plan, query):
+    group_by_clause = next(re.finditer(QUERY_CLAUSE_REGEX.format('GROUP BY'), query))
+    return [find_matching_query(group_by_clause.group(), query)]
 
 def parse_synthesised(plan, query):
     if 'Plans' not in plan:
@@ -346,9 +350,9 @@ def find_largest_node(plan, largest_size):
         for sub_plan in plan['Plans']:
             find_largest_node(sub_plan, largest_size)
 
-tests = read_json('tests.json')
-test = tests[4]
-execution_plan = test['Execution Plan']
-query = format(test['Query'])
-e, q = analyze(execution_plan, query)
-e['Plan']['Query']
+# tests = read_json('tests.json')
+# test = tests[0]
+# execution_plan = test['Execution Plan']
+# query = format(test['Query'])
+# e, q = analyze(execution_plan, query)
+# e['Plan']['Query']
