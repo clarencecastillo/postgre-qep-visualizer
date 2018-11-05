@@ -12,6 +12,7 @@
   </div>
   <div class="container-fluid pb-5 pt-3">
     <hr>
-    <button type="button" class="btn btn-outline-light float-right border-0" [disabled]="error" routerLink="/graph" (click)="onSubmit()">Submit</button>
+    <button type="button" class="btn btn-outline-light float-left border-0" (click)="loadSample()">Load Sample</button>
+    <button type="button" class="btn btn-outline-light float-right border-0" [disabled]="!planText || error" routerLink="/graph" (click)="onSubmit()">Submit</button>
   </div>
 </div>

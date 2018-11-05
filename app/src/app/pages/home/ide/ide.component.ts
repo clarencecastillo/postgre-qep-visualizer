@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-ide',
   templateUrl: './ide.component.html',
   styleUrls: ['./ide.component.scss']
 })
-export class IdeComponent implements OnInit {
+export class IdeComponent implements OnInit, OnChanges {
 
   @Input() error: string;
 
@@ -23,6 +23,12 @@ export class IdeComponent implements OnInit {
   onTextChange() {
     this.countLines();
     this.textChange.emit(this.text);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['text']) {
+      this.onTextChange();
+    }
   }
 
   private countLines() {

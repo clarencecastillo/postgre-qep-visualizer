@@ -9,28 +9,40 @@ import { PlanService } from 'src/app/services/plan/plan.service';
 })
 export class HomeComponent implements OnInit {
 
-  planText: string = SAMPLE_EXECUTION_PLAN;
-  query: string = SAMPLE_QUERY;
+  planText: string;
+  query: string;
   error: string;
 
   constructor(private planService: PlanService) { }
 
   ngOnInit() {
     this.onPlanTextChange(this.planText);
+    this.query = this.planService.getQuery();
+    const savedPlanText = this.planService.getExecutionPlanText();
+    if (savedPlanText) {
+      this.planText = JSON.stringify([JSON.parse(savedPlanText)], null, 2);
+    }
   }
 
   onPlanTextChange(planText: string) {
-    try {
-      this.planService.setExecutionPlan(planText);
-      this.planText = planText;
-      this.error = undefined;
-    } catch (e) {
-      this.error = e.message;
+    if (planText) {
+      try {
+        this.planService.setExecutionPlan(planText);
+        this.planText = planText;
+        this.error = undefined;
+      } catch (e) {
+        this.error = e.message;
+      }
     }
   }
 
   onSubmit() {
     this.planService.setQuery(this.query);
+  }
+
+  loadSample() {
+    this.onPlanTextChange(SAMPLE_EXECUTION_PLAN);
+    this.query = SAMPLE_QUERY;
   }
 
 }

@@ -47,7 +47,8 @@ export class PlanService {
     try {
       this.executionPlan = JSON.parse(executionPlan)[0];
       if (save) {
-        localStorage.setItem(this.STORAGE_EXECUTION_PLAN, executionPlan);
+        const parsedText = JSON.stringify(this.executionPlan);
+        localStorage.setItem(this.STORAGE_EXECUTION_PLAN, parsedText);
       }
     } catch (e) {
       this.executionPlan = undefined;
@@ -60,6 +61,15 @@ export class PlanService {
 
   getExecutionPlan(): any {
     return this.executionPlan;
+  }
+
+  getExecutionPlanText() {
+    const savedExecutionPlan = localStorage.getItem(this.STORAGE_EXECUTION_PLAN);
+    if (savedExecutionPlan) {
+      return savedExecutionPlan;
+    }
+
+    return undefined;
   }
 
   setQuery(query: string, save: boolean = true) {

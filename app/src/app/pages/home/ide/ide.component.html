@@ -4,6 +4,6 @@
       <textarea class="form-control" rows="30" [(ngModel)]="text" [ngModelOptions]="{standalone: true}" (input)="onTextChange()"></textarea>
     </div>
   </form>
-  <div class="alert alert-danger" role="alert" *ngIf="error">{{error}}</div>
+  <div class="alert alert-danger" role="alert" *ngIf="text && error">{{error}}</div>
   <p class="text-light pl-1">Lines: {{linesCount}}</p>
 </div>

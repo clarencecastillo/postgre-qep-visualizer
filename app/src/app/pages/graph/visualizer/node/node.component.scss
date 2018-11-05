@@ -52,6 +52,12 @@ $default-edge-color: #858585;
     }
   }
 
+  &.first {
+    & > .node {
+      margin: auto;
+    }
+  }
+
   &:not(.first) {
     .node {
       &::before {
