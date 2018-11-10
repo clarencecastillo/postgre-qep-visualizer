@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: false,
+  api: 'http://postgre-qep-visualizer.herokuapp.com'
 };
