@@ -28,4 +28,6 @@ def root(path):
     return send_from_directory('static', path)
 
 if __name__ == "__main__":
-    app.run()
+    port = os.environ['PORT'] if 'PORT' in os.environ else '5000'
+    host = '0.0.0.0'
+    app.run(host=host, port=port)
