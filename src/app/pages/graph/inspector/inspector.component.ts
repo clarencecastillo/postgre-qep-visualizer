@@ -9,7 +9,7 @@ import { PlanService } from 'src/app/services/plan/plan.service';
 })
 export class InspectorComponent implements OnInit {
 
-  private readonly HANDLED_ATTRIBUTES = [
+  readonly HANDLED_ATTRIBUTES = [
     'Plans',
     'Query',
     'Description',
@@ -19,7 +19,7 @@ export class InspectorComponent implements OnInit {
     'Has Greatest Errors'
   ];
 
-  private readonly CALCULATED_ATTRIBUTES = ['Actual Duration', 'Actual Cost', 'Estimate Errors'];
+  readonly CALCULATED_ATTRIBUTES = ['Actual Duration', 'Actual Cost', 'Estimate Errors'];
 
   @Input() plan: any;
   @Input() query: string;
