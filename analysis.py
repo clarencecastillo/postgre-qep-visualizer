@@ -22,7 +22,7 @@ def analyze(execution_plan):
     execution_plan['Longest Duration'] = get_longest_duration(root_plan)
     find_slowest_node(root_plan, execution_plan['Longest Duration'])
 
-    execution_plan['Highest Cost'] = get_longest_duration(root_plan)
+    execution_plan['Highest Cost'] = get_highest_cost(root_plan)
     find_costliest_node(root_plan, execution_plan['Highest Cost'])
 
     execution_plan['Greatest Errors'] = get_greatest_errors(root_plan)

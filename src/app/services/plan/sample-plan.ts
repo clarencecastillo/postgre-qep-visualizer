@@ -24,19 +24,6 @@ export const SAMPLE_EXECUTION_PLAN = `[
       "Local Written Blocks": 0,
       "Temp Read Blocks": 0,
       "Temp Written Blocks": 0,
-      "Expected Query": [{
-        "start": 14,
-        "end": 23,
-        "match": "PUBLISHER"
-      }, {
-        "start": 26,
-        "end": 32,
-        "match": "SCHOOL"
-      }, {
-        "start": 39,
-        "end": 78,
-        "match": "SCHOOL.SCHOOLID = PUBLISHER.PUBLISHERID"
-      }],
       "Plans": [{
           "Node Type": "Seq Scan",
           "Parent Relationship": "Outer",

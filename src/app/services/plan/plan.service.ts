@@ -25,12 +25,12 @@ export class PlanService {
 
     const savedExecutionPlan = localStorage.getItem(this.STORAGE_EXECUTION_PLAN);
     if (savedExecutionPlan) {
-      this.setExecutionPlan(savedExecutionPlan, false);
+      this.executionPlan = JSON.parse(savedExecutionPlan);
     }
 
     const savedQuery = localStorage.getItem(this.STORAGE_QUERY);
     if (savedQuery) {
-      this.setQuery(savedQuery, false);
+      this.query = savedQuery;
     }
   }
 
@@ -43,18 +43,14 @@ export class PlanService {
     this.selectedPlan = this.selectedPlan;
   }
 
-  setExecutionPlan(executionPlan: string, save: boolean = true) {
+  setExecutionPlan(executionPlan: string) {
     try {
       this.executionPlan = JSON.parse(executionPlan)[0];
-      if (save) {
-        const parsedText = JSON.stringify(this.executionPlan);
-        localStorage.setItem(this.STORAGE_EXECUTION_PLAN, parsedText);
-      }
+      const parsedText = JSON.stringify(this.executionPlan);
+      localStorage.setItem(this.STORAGE_EXECUTION_PLAN, parsedText);
     } catch (e) {
       this.executionPlan = undefined;
-      if (save) {
-        localStorage.removeItem(this.STORAGE_EXECUTION_PLAN);
-      }
+      localStorage.removeItem(this.STORAGE_EXECUTION_PLAN);
       throw new Error('The JSON string contains errors');
     }
   }
@@ -72,11 +68,9 @@ export class PlanService {
     return undefined;
   }
 
-  setQuery(query: string, save: boolean = true) {
+  setQuery(query: string) {
     this.query = query;
-    if (save) {
-      localStorage.setItem(this.STORAGE_QUERY, query);
-    }
+    localStorage.setItem(this.STORAGE_QUERY, query);
   }
 
   getQuery(): string {

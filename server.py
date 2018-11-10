@@ -8,10 +8,6 @@ from parser import parse
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/')
-def index():
-    return redirect('/index.html')
-
 @app.route('/api/parse', methods=['POST'])
 def api():
     data = request.get_json()
@@ -22,10 +18,14 @@ def api():
         'query': query
     })
 
+@app.route('/', defaults={'path': 'index.html'})
 @app.route('/<path:path>')
 def root(path):
-    print(path)
     return send_from_directory('static', path)
+
+@app.errorhandler(404)
+def redirect_404(path):
+    return send_from_directory('static', 'index.html')
 
 if __name__ == "__main__":
     port = os.environ['PORT'] if 'PORT' in os.environ else '5000'
