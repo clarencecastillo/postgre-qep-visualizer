@@ -78,7 +78,7 @@ export class PlanService {
   }
 
   getAugmentedPlanStatistics(plan: any, query: string) {
-    return this.http.post(`http://${environment.api}/api/parse`, {
+    return this.http.post(`${environment.api}/api/parse`, {
       plan, query
     }).toPromise();
   }
