@@ -1,0 +1,346 @@
+[
+  {
+    "Query": "SELECT CUSTOMER.C_NAME,CUSTOMER.C_ADDRESS, ORDERS.O_ORDERSTATUS FROM CUSTOMER, ORDERS WHERE CUSTOMER.C_CUSTKEY = ORDERS.O_CUSTKEY;",
+    "Test Case": "Hash Join",
+    "Execution Plan": {
+		"Execution Time": 1669.111,
+		"Planning Time": 0.288,
+		"Plan": {
+		  "Temp Written Blocks": 4864,
+		  "Node Type": "Hash Join",
+		  "Actual Total Time": 1624.589,
+		  "Shared Hit Blocks": 3735,
+		  "Inner Unique": true,
+      "Expected Query": [{
+        "start": 96,
+        "end": 133,
+        "match": "CUSTOMER.C_CUSTKEY = ORDERS.O_CUSTKEY"
+      }],
+		  "Plans": [
+			{
+			  "Node Type": "Seq Scan",
+			  "Actual Total Time": 532.941,
+			  "Shared Hit Blocks": 64,
+			  "Schema": "public",
+			  "Shared Read Blocks": 27208,
+			  "Relation Name": "orders",
+			  "Local Hit Blocks": 0,
+			  "Local Dirtied Blocks": 0,
+			  "Temp Written Blocks": 0,
+			  "Plan Width": 8,
+			  "Total Cost": 42272,
+			  "Actual Startup Time": 0.059,
+			  "Alias": "orders",
+			  "Temp Read Blocks": 0,
+			  "Output": [
+				"orders.o_orderstatus",
+				"orders.o_custkey"
+			  ],
+			  "Local Read Blocks": 0,
+			  "Startup Cost": 0,
+			  "Shared Dirtied Blocks": 0,
+			  "Shared Written Blocks": 0,
+			  "Local Written Blocks": 0,
+			  "Plan Rows": 1500000,
+			  "Parallel Aware": false,
+			  "Actual Rows": 1500000,
+			  "Parent Relationship": "Outer",
+			  "Actual Loops": 1,
+        "Expected Query": [{
+          "start": 83,
+          "end": 89,
+          "match": "ORDERS"
+        }]
+			},
+			{
+			  "Node Type": "Hash",
+			  "Actual Total Time": 69.231,
+			  "Peak Memory Usage": 3573,
+			  "Shared Hit Blocks": 3671,
+        "Expected Query": [{
+          "start": 72,
+          "end": 80,
+          "match": "CUSTOMER"
+        }],
+			  "Plans": [
+				{
+				  "Node Type": "Seq Scan",
+				  "Actual Total Time": 20.435,
+				  "Shared Hit Blocks": 3671,
+				  "Schema": "public",
+				  "Shared Read Blocks": 0,
+				  "Relation Name": "customer",
+				  "Local Hit Blocks": 0,
+				  "Local Dirtied Blocks": 0,
+				  "Temp Written Blocks": 0,
+				  "Plan Width": 51,
+				  "Total Cost": 5171,
+				  "Actual Startup Time": 0.012,
+				  "Alias": "customer",
+				  "Temp Read Blocks": 0,
+				  "Output": [
+					"customer.c_name",
+					"customer.c_address",
+					"customer.c_custkey"
+				  ],
+				  "Local Read Blocks": 0,
+				  "Startup Cost": 0,
+				  "Shared Dirtied Blocks": 0,
+				  "Shared Written Blocks": 0,
+				  "Local Written Blocks": 0,
+				  "Plan Rows": 150000,
+				  "Parallel Aware": false,
+				  "Actual Rows": 150000,
+				  "Parent Relationship": "Outer",
+				  "Actual Loops": 1,
+          "Expected Query": [{
+            "start": 72,
+            "end": 80,
+            "match": "CUSTOMER"
+          }]
+				}
+			  ],
+			  "Shared Read Blocks": 0,
+			  "Local Hit Blocks": 0,
+			  "Local Read Blocks": 0,
+			  "Local Dirtied Blocks": 0,
+			  "Temp Written Blocks": 977,
+			  "Plan Width": 51,
+			  "Actual Loops": 1,
+			  "Original Hash Buckets": 65536,
+			  "Hash Batches": 4,
+			  "Actual Startup Time": 69.231,
+			  "Temp Read Blocks": 0,
+			  "Output": [
+				"customer.c_name",
+				"customer.c_address",
+				"customer.c_custkey"
+			  ],
+			  "Original Hash Batches": 4,
+			  "Hash Buckets": 65536,
+			  "Startup Cost": 5171,
+			  "Shared Dirtied Blocks": 0,
+			  "Shared Written Blocks": 0,
+			  "Local Written Blocks": 0,
+			  "Plan Rows": 150000,
+			  "Parallel Aware": false,
+			  "Actual Rows": 150000,
+			  "Parent Relationship": "Inner",
+			  "Total Cost": 5171
+			}
+		  ],
+		  "Shared Read Blocks": 27208,
+		  "Join Type": "Inner",
+		  "Local Hit Blocks": 0,
+		  "Local Dirtied Blocks": 0,
+		  "Hash Cond": "((orders.o_custkey)::text = (customer.c_custkey)::text)",
+		  "Plan Width": 47,
+		  "Actual Loops": 1,
+		  "Actual Startup Time": 70.729,
+		  "Temp Read Blocks": 4870,
+		  "Output": [
+			"customer.c_name",
+			"customer.c_address",
+			"orders.o_orderstatus"
+		  ],
+		  "Local Read Blocks": 0,
+		  "Startup Cost": 8511,
+		  "Shared Dirtied Blocks": 0,
+		  "Shared Written Blocks": 0,
+		  "Local Written Blocks": 0,
+		  "Plan Rows": 1500000,
+		  "Parallel Aware": false,
+		  "Actual Rows": 1500000,
+		  "Total Cost": 82905.41
+		},
+		"Triggers": []
+	  }
+  },
+
+  {
+    "Query": "SELECT C_NAME,C_ADDRESS,C_ACCTBAL FROM CUSTOMER WHERE C_ACCTBAL < 0",
+    "Test Case": "Seq Scan",
+    "Execution Plan": {
+		"Execution Time": 19.423,
+		"Planning Time": 0.087,
+		"Plan": {
+		  "Node Type": "Seq Scan",
+		  "Actual Total Time": 19.04,
+		  "Shared Hit Blocks": 3671,
+		  "Schema": "public",
+		  "Shared Read Blocks": 0,
+		  "Relation Name": "customer",
+		  "Local Hit Blocks": 0,
+		  "Local Dirtied Blocks": 0,
+		  "Temp Written Blocks": 0,
+		  "Plan Width": 53,
+		  "Total Cost": 5546,
+		  "Actual Startup Time": 0.015,
+		  "Filter": "(customer.c_acctbal < '0'::double precision)",
+		  "Alias": "customer",
+		  "Temp Read Blocks": 0,
+		  "Output": [
+			"c_name",
+			"c_address",
+			"c_acctbal"
+		  ],
+		  "Local Read Blocks": 0,
+		  "Startup Cost": 0,
+		  "Shared Dirtied Blocks": 0,
+		  "Shared Written Blocks": 0,
+		  "Local Written Blocks": 0,
+		  "Plan Rows": 13666,
+		  "Parallel Aware": false,
+		  "Actual Rows": 13692,
+		  "Actual Loops": 1,
+		  "Rows Removed by Filter": 136308,
+      "Expected Query": [{
+        "start": 43,
+        "end": 51,
+        "match": "CUSTOMER"
+      }, {
+        "start": 58,
+        "end": 71,
+        "match": "C_ACCTBAL < 0"
+      }]
+		},
+		"Triggers": []
+	  }
+  },
+
+  {
+    "Query": "SELECT P_NAME,P_RETAILPRICE FROM PART,PARTSUPP WHERE P_PARTKEY = PS_PARTKEY AND PS_AVAILQTY >= 1000",
+    "Test Case": "Merge Join (set enable_hashjoin = off)",
+    "Execution Plan": {
+		"Execution Time": 752.023,
+		"Planning Time": 0.531,
+		"Plan": {
+		  "Node Type": "Merge Join",
+		  "Actual Total Time": 731.219,
+		  "Shared Hit Blocks": 104782,
+		  "Inner Unique": false,
+      "Expected Query": [{
+        "start": 57,
+        "end": 79,
+        "match": "P_PARTKEY = PS_PARTKEY"
+      }],
+		  "Plans": [
+			{
+			  "Node Type": "Index Scan",
+			  "Actual Total Time": 138.42,
+			  "Shared Hit Blocks": 37168,
+			  "Schema": "public",
+			  "Scan Direction": "Forward",
+			  "Shared Read Blocks": 5209,
+			  "Relation Name": "part",
+			  "Local Hit Blocks": 0,
+			  "Local Dirtied Blocks": 0,
+			  "Temp Written Blocks": 0,
+			  "Plan Width": 47,
+			  "Total Cost": 21865.64,
+			  "Actual Startup Time": 0.011,
+			  "Alias": "part",
+			  "Temp Read Blocks": 0,
+			  "Output": [
+				"part.p_partkey",
+				"part.p_name",
+				"part.p_mfgr",
+				"part.p_brand",
+				"part.p_type",
+				"part.p_size",
+				"part.p_container",
+				"part.p_retailprice",
+				"part.p_comment"
+			  ],
+			  "Local Read Blocks": 0,
+			  "Index Name": "part_pkey",
+			  "Startup Cost": 0.42,
+			  "Shared Dirtied Blocks": 0,
+			  "Shared Written Blocks": 1,
+			  "Local Written Blocks": 0,
+			  "Plan Rows": 200000,
+			  "Parallel Aware": false,
+			  "Actual Rows": 200000,
+			  "Parent Relationship": "Outer",
+			  "Actual Loops": 1,
+        "Expected Query": [{
+          "start": 35,
+          "end": 39,
+          "match": "PART"
+        }]
+			},
+			{
+			  "Node Type": "Index Scan",
+			  "Actual Total Time": 335.941,
+			  "Shared Hit Blocks": 67614,
+			  "Schema": "public",
+			  "Scan Direction": "Forward",
+			  "Shared Read Blocks": 11376,
+			  "Relation Name": "partsupp",
+			  "Local Hit Blocks": 0,
+			  "Local Dirtied Blocks": 0,
+			  "Temp Written Blocks": 0,
+			  "Plan Width": 6,
+			  "Total Cost": 102723.84,
+			  "Actual Startup Time": 0.005,
+			  "Filter": "(partsupp.ps_availqty >= 1000)",
+			  "Alias": "partsupp",
+			  "Temp Read Blocks": 0,
+			  "Output": [
+				"partsupp.ps_partkey",
+				"partsupp.ps_suppkey",
+				"partsupp.ps_availqty",
+				"partsupp.ps_supplycost",
+				"partsupp.ps_comment"
+			  ],
+			  "Local Read Blocks": 0,
+			  "Index Name": "partsupp_pkey",
+			  "Startup Cost": 0.42,
+			  "Shared Dirtied Blocks": 0,
+			  "Shared Written Blocks": 0,
+			  "Local Written Blocks": 0,
+			  "Plan Rows": 721723,
+			  "Parallel Aware": false,
+			  "Actual Rows": 720391,
+			  "Parent Relationship": "Inner",
+			  "Actual Loops": 1,
+			  "Rows Removed by Filter": 79609,
+        "Expected Query": [{
+          "start": 42,
+          "end": 50,
+          "match": "PARTSUPP"
+        }, {
+          "start": 86,
+          "end": 105,
+          "match": "PS_AVAILQTY >= 1000"
+        }]
+			}
+		  ],
+		  "Shared Read Blocks": 16585,
+		  "Join Type": "Inner",
+		  "Local Hit Blocks": 0,
+		  "Merge Cond": "((part.p_partkey)::text = (partsupp.ps_partkey)::text)",
+		  "Local Dirtied Blocks": 0,
+		  "Temp Written Blocks": 0,
+		  "Plan Width": 41,
+		  "Actual Loops": 1,
+		  "Actual Startup Time": 0.018,
+		  "Temp Read Blocks": 0,
+		  "Output": [
+			"part.p_name",
+			"part.p_retailprice"
+		  ],
+		  "Local Read Blocks": 0,
+		  "Startup Cost": 224.5,
+		  "Shared Dirtied Blocks": 0,
+		  "Shared Written Blocks": 1,
+		  "Local Written Blocks": 0,
+		  "Plan Rows": 721723,
+		  "Parallel Aware": false,
+		  "Actual Rows": 720391,
+		  "Total Cost": 134111.01
+		},
+		"Triggers": []
+	  }
+  }
+]

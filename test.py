@@ -27,4 +27,11 @@ def validate_plan(plan):
             validate_plan(sub_plan)
 
 tests = read_json('tests.json')
+tests = read_json('testsTPCH.json')
 run_tests()
+
+# use format and regex to get Expected Query
+# query = format(tests[1]['Query'])
+# query
+# 'SELECT C_NAME,\n\tC_ADDRESS,\n\tC_ACCTBAL\nFROM CUSTOMER\nWHERE C_ACCTBAL < 0'
+# list(re.finditer('C_ACCTBAL < 0', query))
