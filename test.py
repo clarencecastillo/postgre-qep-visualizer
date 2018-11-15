@@ -26,7 +26,7 @@ def validate_plan(plan):
         for sub_plan in plan['Plans']:
             validate_plan(sub_plan)
 
-tests = read_json('tests.json')
+tests = read_json('testsDBLP.json')
 tests = read_json('testsTPCH.json')
 run_tests()
 
