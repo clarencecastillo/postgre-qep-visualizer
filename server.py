@@ -1,8 +1,8 @@
 from flask import Flask, request, send_from_directory, redirect, jsonify
 from flask_cors import CORS
 import os
-from analysis import analyze
-from parser import parse
+from qep_analysis import analyze
+from qep_parser import parse
 
 # set the project root directory as the static folder, you can set others.
 app = Flask(__name__)
