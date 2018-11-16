@@ -1,6 +1,6 @@
 from utils import format, read_json
-from analysis import analyze
-from parser import parse
+from qep_analysis import analyze
+from qep_parser import parse
 from operator import itemgetter
 import re
 
