@@ -2,7 +2,7 @@
 
 ## About
 
-
+The QEP Visualiser Tool is a web application built using Flask and Angular. This project aims to explore the development of a new QEP visualiser that is able to compensate for the shortfalls of current QEP visualisation tools offered. This will aid us in understanding how to go about fine tuning the database to improve performance.
 
 ## Usage
 
@@ -15,6 +15,8 @@ To visualize a query execution plan:
 2. Paste the corresponding SQL query to the second text field. This field does not perform any syntax checking and therefore assumes the given query is correct.
 
 A sample query is provided and can be loaded by clicking on the *Load Sample* button at the bottom. Note that the application uses the browser's _localstorage_ to store the most recent QEP Plan and SQL Query.
+
+If deployed locally, the application can be accessed via your browser at http://localhost:5000. It is recommended to use the app using Google Chrome at a higher resolution screen (or zoom out a little if it's to stuffy).
 
 ## Dependencies
 

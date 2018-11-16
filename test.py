@@ -29,5 +29,5 @@ def validate_plan(plan):
 if __name__ == "__main__":
     print("\nDBLP TESTS")
     run_tests(read_json('tests_dblp.json'))
-    print("\nTCPH TESTS")
-    run_tests(read_json('tests_tcph.json'))
+    print("\nTPCH TESTS")
+    run_tests(read_json('tests_tpch.json'))
