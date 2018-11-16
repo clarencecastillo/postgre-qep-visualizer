@@ -4,7 +4,7 @@ from parser import parse
 from operator import itemgetter
 import re
 
-def run_tests():
+def run_tests(tests):
 
     for i, test in enumerate(tests):
         test_case = test['Test Case']
@@ -26,12 +26,8 @@ def validate_plan(plan):
         for sub_plan in plan['Plans']:
             validate_plan(sub_plan)
 
-tests = read_json('testsDBLP.json')
-tests = read_json('testsTPCH.json')
-run_tests()
-
-# use format and regex to get Expected Query
-# query = format(tests[1]['Query'])
-# query
-# 'SELECT C_NAME,\n\tC_ADDRESS,\n\tC_ACCTBAL\nFROM CUSTOMER\nWHERE C_ACCTBAL < 0'
-# list(re.finditer('C_ACCTBAL < 0', query))
+if __name__ == "__main__":
+    print("\nDBLP TESTS")
+    run_tests(read_json('tests_dblp.json'))
+    print("\nTCPH TESTS")
+    run_tests(read_json('tests_tcph.json'))
