@@ -8,8 +8,8 @@ QUERY_SCAN_RELATION_REGEX = r"(?<=[\s,]){0}(\s+{1})?"
 QUERY_CLAUSE_REGEX = r'(?<=[\s]){0}\s.*(\n\t+.*)*(?<!\t)'
 QUERY_DISTINCT_ON_REGEX = "DISTINCT ON \(.*\)"
 
-FILTERS_PAREN_REGEX = r"\(([\%\w\.\/]+)\)::[a-z]+"
-FILTERS_QUOTE_REGEX = r"'([\%\w\.\/]+)'::[a-z]+"
+FILTERS_PAREN_REGEX = r"\(([\%\w\.\/]+)\)::([a-z\d]+(\s[a-z\d]+)*)"
+FILTERS_QUOTE_REGEX = r"'([\%\w\.\/]+)'::([a-z\d]+(\s[a-z\d]+)*)"
 
 def parse(execution_plan, query):
 
@@ -203,10 +203,20 @@ def extract_conditions(layers):
         condition = layers[0]
         if isinstance(condition, str):
             conditions = [condition]
+            split_condition = condition.split(' ')
+
             # adds symmetric representation of the condition i.e. a == b (as sometimes the condition might be reversed)
             if ('=' in condition):
-                symmetric = ' '.join(condition.split(' ')[::-1])
+                symmetric = ' '.join(split_condition[::-1])
                 conditions.append(symmetric)
+
+            # adds literal version of a quoted numeric condition i.e. a == '1' -> a == 1
+            condition_rhs = split_condition[-1]
+            quoted_value = re.findall(r"\'(.*)\'", condition_rhs)
+            if quoted_value and quoted_value[0].isnumeric():
+                numeric_literal = ' '.join(split_condition[:-1] + [quoted_value[0]])
+                conditions.append(numeric_literal)
+
             return conditions
         else:
             return [extract_conditions(condition)]
@@ -224,6 +234,6 @@ def parse_filters(filters):
     filters = re.sub(FILTERS_PAREN_REGEX, "\g<1>", filters)
 
     # parse '{0}'::{1} -> '{0}'
-    filters = re.sub(FILTERS_QUOTE_REGEX, "'\g<1>'",filters)
+    filters = re.sub(FILTERS_QUOTE_REGEX, "'\g<1>'", filters)
 
     return extract_conditions(parse_nested(filters))
